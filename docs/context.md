@@ -361,19 +361,6 @@ pain.001 comes back, which is what makes auto-matching work:
 
   - Verify line lengths and current bank support before publishing.
 
-- Each country also had its own payment and collection files next to the statement format. SEPA replaced
-  most of them with pain.001/pain.008; the ones still in use are marked:
-
-  | Country | Statements           | Payments (outgoing)                                         | Collections (incoming)                                    |
-  | ------- | -------------------- | ----------------------------------------------------------- | --------------------------------------------------------- |
-  | Belgium | CODA                 | Febelfin pain.001 flavour (old domestic files retired)      | DOM'80 direct debit (retired, now SDD pain.008)           |
-  | France  | CFONB 120            | CFONB 160 transfers (retired), CFONB 320 international      | LCR (lettre de change relevé), CFONB 160 layout, **live** |
-  | Germany | MT940/MT942 (`:86:`) | DTAUS (retired 2014-2016), DTAZV non-SEPA foreign, **live** | DTAUS debits (retired, now SDD pain.008)                  |
-  | Spain   | Norma 43             | Norma 34 transfers (now XML-based)                          | Norma 19 / 19.14 direct debits (SDD, flat-file variant)   |
-  | Italy   | CBI RH               | CBI BB bonifici (retired, now CBI XML pain.001)             | RiBa (ricevuta bancaria), CBI flat file, **live**         |
-
-  - Article angle: the "live" ones (LCR, RiBa, DTAZV) exist because they cover something SEPA does not
-    (bill-of-exchange style collections, non-EUR/non-SEPA payments). Verify status and dates before publishing.
   - Small examples, same story in each (opening balance 1,000.00 EUR, one 250.00 credit, closing balance 1,250.00).
     These only show the record structure: lines are shortened with `...` and the column positions are not exact.
     Build the article/repo samples from the official specs. Date formats differ: CODA, CFONB and CBI use DDMMYY,
@@ -451,6 +438,61 @@ pain.001 comes back, which is what makes auto-matching work:
       </Ntry>
     </Stmt>
     ```
+
+- National payment/collection files still in use next to the statement formats (the rest were replaced by
+  SEPA pain.001/pain.008). They survive because they cover cases SEPA does not:
+
+  | Country | Still-used format  | Purpose                                                     |
+  | ------- | ------------------ | ----------------------------------------------------------- |
+  | France  | LCR (CFONB 160)    | Bill-of-exchange style collection with a due date           |
+  | Germany | DTAZV              | Non-SEPA / non-EUR foreign payments                         |
+  | Spain   | Norma 19.14 (flat) | SEPA direct debit in the Spanish flat-file layout           |
+  | Italy   | RiBa (CBI)         | Bank receipt collection (ricevuta bancaria) with a due date |
+
+  Belgium has no live equivalent: payments and debits go out as pain.001/pain.008 (see 2.2).
+
+  Small examples, same style as above (shortened with `...`, positions not exact, verify against specs).
+  Story: ACME collects 250.00 EUR from DUPONT, or pays GLOBEX 12,500.00 USD.
+
+  France, LCR (CFONB 160 layout, operation code `60`, DDMMYY dates):
+
+  ```text
+  0360...ACME SA...241126...EUR...                                               <- header (03 = remittance, 60 = LCR)
+  0660...DUPONT SA...30004...00012345678...000000025000...301226...INV-2026-001  <- one bill: amount, due date
+  0860...000000025000...                                                         <- total
+  ```
+
+  Germany, DTAZV (record length + type: Q header 256, T payment 768, Z trailer 256):
+
+  ```text
+  0256Q...10020030...ACME GMBH...261124...                                     <- header
+  0768T...USD...000000001250000...GLOBEX CORP...US...BANKUS33...INV-2026-0042  <- payment
+  0256Z...000000001250000...0001...                                            <- trailer: sum, count
+  ```
+
+  Spain, Norma 19.14 flat file (record code + `19143` = core SDD, YYYYMMDD dates):
+
+  ```text
+  0119143001ES12000B12345678...ACME SL...20261124...                                                 <- presenter header
+  0219143002ES12000B12345678...20261128...ACME SL...                                                 <- creditor header + collection date
+  0319143003INV-2026-001...MANDATE-0001...RCUR...00000025000...ES9121000418450200051332...DUPONT SA  <- one debit
+  04ES12000B12345678...00000025000...0000000001...                                                   <- creditor total
+  99...00000025000...0000000001...                                                                   <- file total
+  ```
+
+  Italy, RiBa (CBI flat file, record type in columns 2-3, DDMMYY dates):
+
+  ```text
+   IB...ACME SPA...241126...                   <- header
+   14...000000025000...301226...DUPONT SRL...  <- amount, due date
+   20...ACME SPA...                            <- creditor
+   30...DUPONT SRL...                          <- debtor
+   40...VIA ROMA 1...20100 MILANO MI...        <- debtor address
+   50...INV-2026-001...                        <- reference
+   51...0000000001...                          <- receipt number
+   70...                                       <- closing
+   EF...                                       <- file end
+  ```
 
 - Nice code demo: parse a CODA file in ~50 lines of Java 25 (records + switch pattern matching on record
   type) and map to the same domain model as camt.053.
