@@ -360,6 +360,20 @@ pain.001 comes back, which is what makes auto-matching work:
   | Italy   | CBI RH                                                | Fixed-width, 120 chars/line |
 
   - Verify line lengths and current bank support before publishing.
+
+- Each country also had its own payment and collection files next to the statement format. SEPA replaced
+  most of them with pain.001/pain.008; the ones still in use are marked:
+
+  | Country | Statements           | Payments (outgoing)                                         | Collections (incoming)                                    |
+  | ------- | -------------------- | ----------------------------------------------------------- | --------------------------------------------------------- |
+  | Belgium | CODA                 | Febelfin pain.001 flavour (old domestic files retired)      | DOM'80 direct debit (retired, now SDD pain.008)           |
+  | France  | CFONB 120            | CFONB 160 transfers (retired), CFONB 320 international      | LCR (lettre de change relevé), CFONB 160 layout, **live** |
+  | Germany | MT940/MT942 (`:86:`) | DTAUS (retired 2014-2016), DTAZV non-SEPA foreign, **live** | DTAUS debits (retired, now SDD pain.008)                  |
+  | Spain   | Norma 43             | Norma 34 transfers (now XML-based)                          | Norma 19 / 19.14 direct debits (SDD, flat-file variant)   |
+  | Italy   | CBI RH               | CBI BB bonifici (retired, now CBI XML pain.001)             | RiBa (ricevuta bancaria), CBI flat file, **live**         |
+
+  - Article angle: the "live" ones (LCR, RiBa, DTAZV) exist because they cover something SEPA does not
+    (bill-of-exchange style collections, non-EUR/non-SEPA payments). Verify status and dates before publishing.
   - Small examples, same story in each (opening balance 1,000.00 EUR, one 250.00 credit, closing balance 1,250.00).
     These only show the record structure: lines are shortened with `...` and the column positions are not exact.
     Build the article/repo samples from the official specs. Date formats differ: CODA, CFONB and CBI use DDMMYY,
