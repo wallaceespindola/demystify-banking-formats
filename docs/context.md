@@ -136,6 +136,21 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
 - Categories: MT1xx customer payments, MT2xx FI transfers, MT3xx treasury/FX, MT5xx securities,
   MT7xx trade finance, MT9xx cash management/statements.
 - Famous ones: MT101, MT103, MT202, MT202COV, MT940, MT942, MT950, MT199.
+- MT94x family (customer cash reporting, the ones corporates actually parse):
+
+  | Message | Name | Purpose | ISO 20022 successor |
+  |---|---|---|---|
+  | MT940 | Customer Statement Message | End-of-day statement: opening/closing balance plus every booked entry | camt.053 |
+  | MT941 | Balance Report | Balances only, no entry detail | camt.052 |
+  | MT942 | Interim Transaction Report | Intraday entries (booked and optionally pending) since last report | camt.052 |
+
+  - Sibling worth naming: MT950 Statement Message (FI-to-FI nostro statement, no `:86:` narrative) → camt.053.
+  - Key MT940 fields: `:20:` reference, `:25:` account, `:28C:` statement/sequence number, `:60F:`/`:60M:`
+    opening balance, `:61:` statement line (value date, D/C mark, amount, type code, references), `:86:`
+    information to account owner (free text, 6x65, where every bank invents its own sub-structure), `:62F:`/
+    `:62M:` closing booked balance, `:64:` closing available balance, `:65:` forward available balance.
+  - `:86:` is the pitfall: bank-specific dialects (e.g. German `?20`..`?63` subfields) make "MT940 support"
+    mean one parser per bank. Strong argument for camt.053's structured remittance data.
 - Show a short annotated MT103 snippet vs the equivalent pacs.008 fragment. Best visual in the article.
 - Status: for cross-border payment instructions on SWIFT, MT is retired since the end of coexistence
   (November 2025). MT still lives on in reporting (MT9xx), trade, securities, and inside many banks' cores
@@ -180,6 +195,89 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
 - Why include it: a concrete example of **national legacy formats** (others: MT940 dialects in the
   Netherlands and Germany, AEB43 in Spain, CFONB120 in France, BAI2 in the US). The pattern is the same:
   fixed-width or tag-based local format → camt.053.
+- Same role in other big European markets (bank → ERP statement import), all moving to camt.053:
+
+  | Country | Format | Shape |
+  |---|---|---|
+  | Belgium | CODA | Fixed-width, 128 chars/line |
+  | France | CFONB 120 | Fixed-width, 120 chars/line |
+  | Germany | MT940/MT942 with `?xx` subfields in `:86:`, via EBICS | SWIFT MT tags |
+  | Spain | Norma 43 (AEB 43) | Fixed-width, 80 chars/line |
+  | Italy | CBI RH | Fixed-width, 120 chars/line |
+
+  - Verify line lengths and current bank support before publishing.
+  - Small examples, same story in each (opening balance 1,000.00 EUR, one 250.00 credit, closing balance 1,250.00).
+    These only show the record structure: lines are shortened with `…` and the column positions are not exact.
+    Build the article/repo samples from the official specs. Date formats differ: CODA, CFONB and CBI use DDMMYY,
+    MT940 and Norma 43 use YYMMDD (all samples: 23 Nov 2026 opening, 24 Nov 2026 booking).
+
+    **Family 1: fixed-width national files** (one record per line, record code at the start, positions
+    defined by the spec): CODA, CFONB 120, Norma 43, CBI RH.
+
+    Belgium, CODA (record type = first digit):
+    ```
+    0000024112600005        …ACME NV                   BBRUBEBB   …                  ← header
+    1 …BE68539007547034     EUR0000000001000000231126…               ← old balance
+    21…0000000000250000241126…+++123/4567/89012+++…                ← movement + OGM/VCS
+    8 …BE68539007547034     EUR0000000001250000241126…               ← new balance
+    9 …000004000000000000000000000000250000…                         ← trailer
+    ```
+
+    France, CFONB 120 (record code `01`/`04`/`07`; the sign is overpunched in the last digit, `{` = +0):
+    ```
+    0130004…EUR2…00012345678…231126…ACME SA…0000000010000{          ← old balance
+    0430004…EUR2…00012345678…241126…VIR SEPA RECU DUPONT…000000002500{ ← movement
+    0730004…EUR2…00012345678…241126…0000000012500{                  ← new balance
+    ```
+
+    Spain, Norma 43 (record codes `11`/`22`/`23`/`33`/`88`, 80 chars):
+    ```
+    11 2100 0418 4502000513 261123 261124 2 00000000100000 978 3 ACME SL   ← account header
+    22 …261124 261124 02 …2 00000000025000 …                               ← movement (2 = credit)
+    23 01 TRANSFERENCIA DUPONT SA INV-2026-001                             ← optional concept
+    33 2100 0418 4502000513 … 00000000125000 978                           ← account totals
+    88 999999999999999999 000004                                           ← file end
+    ```
+
+    Italy, CBI RH (fixed-width, record type in columns 2–3):
+    ```
+     RH…ACME SPA…241126…                         ← file header
+     61…IT60X0542811101000000123456…EUR…+1000,00   ← opening balance
+     62…241126…C…250,00…BONIFICO DUPONT…         ← movement
+     63…INV-2026-001…                            ← movement detail
+     64…EUR…+1250,00                             ← closing balance
+     EF…                                         ← file end
+    ```
+
+    **Family 2: SWIFT MT tag-based** (`:tag:` fields, bank-specific `:86:`): MT940/MT942, German flavour shown.
+
+    Germany, MT940 with structured `:86:` (`?00` posting text, `?20`–`?29` purpose, `?32` counterparty):
+    ```
+    :20:STARTUMS
+    :25:10020030/1234567890
+    :28C:00001/001
+    :60F:C261123EUR1000,00
+    :61:2611241124CR250,00NTRFNONREF
+    :86:166?00SEPA-GUTSCHRIFT?20EREF+INV-2026-001?21SVWZ+Rechnung 001?32DUPONT SA
+    :62F:C261124EUR1250,00
+    ```
+
+    **Family 3: ISO 20022 XML** (the target all of the above migrate to): camt.053, trimmed.
+
+    ```xml
+    <Stmt>
+      <Acct><Id><IBAN>BE68539007547034</IBAN></Id></Acct>
+      <Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy="EUR">1000.00</Amt><CdtDbtInd>CRDT</CdtDbtInd>…</Bal>
+      <Bal><Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp><Amt Ccy="EUR">1250.00</Amt><CdtDbtInd>CRDT</CdtDbtInd>…</Bal>
+      <Ntry>
+        <Amt Ccy="EUR">250.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><BookgDt><Dt>2026-11-24</Dt></BookgDt>
+        <NtryDtls><TxDtls>
+          <RltdPties><Dbtr><Pty><Nm>DUPONT SA</Nm></Pty></Dbtr></RltdPties>
+          <RmtInf><Strd><CdtrRefInf><Ref>RF18539007547034</Ref></CdtrRefInf></Strd></RmtInf>
+        </TxDtls></NtryDtls>
+      </Ntry>
+    </Stmt>
+    ```
 - Nice code demo: parse a CODA file in ~50 lines of Java 25 (records + switch pattern matching on record
   type) and map to the same domain model as camt.053.
 
