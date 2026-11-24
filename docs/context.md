@@ -611,4 +611,3 @@ Every date, version number and deadline in this file must be rechecked at writin
 - [ ] Glossary file covering every acronym.
 - [ ] All dates and versions verified against primary sources.
 - [ ] `article-review` pass before delivery.
-- [ ] No AI-assistance statement; DZone version written in the author's own voice.
