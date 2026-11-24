@@ -24,14 +24,14 @@ network rulebook, which is a law, and how a single payment travels through all o
 
 These ten acronyms are not ten competing formats. They sit on different layers:
 
-| Layer | What it answers | Items from the list |
-|-------|-----------------|---------------------|
-| Standard / methodology | How are financial messages modeled and named? | ISO 20022 |
-| Message families (business areas) | What kind of message is it? | PAIN, PACS, CAMT |
-| Network syntax | What does it look like on the wire? | MT (legacy SWIFT FIN), MX (ISO 20022 XML on SWIFT) |
-| Usage rulebooks | Which subset and rules apply on this network/corridor? | CBPR+, CGI-MP (also SEPA EPC, HVPS+) |
-| Local / national formats | What does my bank actually send me here? | CODA (Belgium) |
-| Regulation | What must banks legally expose and how is access secured? | PSD2 |
+| Layer                             | What it answers                                           | Items from the list                                |
+| --------------------------------- | --------------------------------------------------------- | -------------------------------------------------- |
+| Standard / methodology            | How are financial messages modeled and named?             | ISO 20022                                          |
+| Message families (business areas) | What kind of message is it?                               | PAIN, PACS, CAMT                                   |
+| Network syntax                    | What does it look like on the wire?                       | MT (legacy SWIFT FIN), MX (ISO 20022 XML on SWIFT) |
+| Usage rulebooks                   | Which subset and rules apply on this network/corridor?    | CBPR+, CGI-MP (also SEPA EPC, HVPS+)               |
+| Local / national formats          | What does my bank actually send me here?                  | CODA (Belgium)                                     |
+| Regulation                        | What must banks legally expose and how is access secured? | PSD2                                               |
 
 If the reader leaves with that table in their head, the article worked.
 
@@ -86,20 +86,21 @@ If the reader leaves with that table in their head, the article worked.
 
 Customer-to-bank (C2B) and bank-to-customer status. What an ERP / treasury system sends to its bank.
 
-| Message | Purpose |
-|---------|---------|
-| pain.001 | Customer Credit Transfer Initiation (the "payment file", batch of transfers) |
-| pain.002 | Customer Payment Status Report (accepted, rejected, pending, with reason codes) |
-| pain.007 | Customer Payment Reversal |
-| pain.008 | Customer Direct Debit Initiation |
-| pain.009-012 | Mandate initiation, amendment, cancellation, acceptance |
-| pain.013 / pain.014 | Creditor Payment Activation Request / Status (Request to Pay) |
+| Message             | Purpose                                                                         |
+| ------------------- | ------------------------------------------------------------------------------- |
+| pain.001            | Customer Credit Transfer Initiation (the "payment file", batch of transfers)    |
+| pain.002            | Customer Payment Status Report (accepted, rejected, pending, with reason codes) |
+| pain.007            | Customer Payment Reversal                                                       |
+| pain.008            | Customer Direct Debit Initiation                                                |
+| pain.009-012        | Mandate initiation, amendment, cancellation, acceptance                         |
+| pain.013 / pain.014 | Creditor Payment Activation Request / Status (Request to Pay)                   |
 
 Key structure of pain.001: `GrpHdr` (group header, message id, control sum, number of transactions) →
 `PmtInf` (one debtor account, execution date, batch booking) → `CdtTrfTxInf` (each transfer).
 Explain the three levels; it is the first thing developers get wrong.
 
 Example pain.001 (three levels visible):
+
 ```xml
 <CstmrCdtTrfInitn>
   <GrpHdr>                                          <!-- level 1: the file -->
@@ -124,6 +125,7 @@ Example pain.001 (three levels visible):
 ```
 
 Example pain.002 rejection (AC04 = closed account):
+
 ```xml
 <TxInfAndSts>
   <OrgnlEndToEndId>INV-2026-0042</OrgnlEndToEndId>
@@ -136,17 +138,18 @@ Example pain.002 rejection (AC04 = closed account):
 
 Bank-to-bank (interbank). What travels between banks, through clearing systems or correspondents.
 
-| Message | Purpose | MT ancestor |
-|---------|---------|-------------|
-| pacs.008 | FI to FI Customer Credit Transfer | MT103 |
-| pacs.009 | Financial Institution Credit Transfer (incl. COV variant) | MT202 / MT202COV |
-| pacs.002 | FI to FI Payment Status Report | (MT199 free text, partly) |
-| pacs.004 | Payment Return | MT103/MT202 return by convention |
-| pacs.003 | FI to FI Customer Direct Debit | (none common) |
-| pacs.010 | Financial Institution Direct Debit | MT204 |
-| pacs.028 | FI to FI Payment Status Request | MT199/MT299 queries |
+| Message  | Purpose                                                   | MT ancestor                      |
+| -------- | --------------------------------------------------------- | -------------------------------- |
+| pacs.008 | FI to FI Customer Credit Transfer                         | MT103                            |
+| pacs.009 | Financial Institution Credit Transfer (incl. COV variant) | MT202 / MT202COV                 |
+| pacs.002 | FI to FI Payment Status Report                            | (MT199 free text, partly)        |
+| pacs.004 | Payment Return                                            | MT103/MT202 return by convention |
+| pacs.003 | FI to FI Customer Direct Debit                            | (none common)                    |
+| pacs.010 | Financial Institution Direct Debit                        | MT204                            |
+| pacs.028 | FI to FI Payment Status Request                           | MT199/MT299 queries              |
 
 Example pacs.008 transaction (same payment as the MT103 in 2.5; comments show the MT field it replaces):
+
 ```xml
 <CdtTrfTxInf>
   <PmtId>
@@ -174,21 +177,22 @@ Example pacs.008 transaction (same payment as the MT103 in 2.5; comments show th
 
 Account reporting, notifications, exceptions and investigations.
 
-| Message | Purpose | MT ancestor |
-|---------|---------|-------------|
-| camt.052 | Bank to Customer Account Report (intraday) | MT942 |
-| camt.053 | Bank to Customer Statement (end of day) | MT940 / MT950 |
+| Message  | Purpose                                    | MT ancestor   |
+| -------- | ------------------------------------------ | ------------- |
+| camt.052 | Bank to Customer Account Report (intraday) | MT942         |
+| camt.053 | Bank to Customer Statement (end of day)    | MT940 / MT950 |
 | camt.054 | Bank to Customer Debit/Credit Notification | MT900 / MT910 |
-| camt.056 | FI to FI Payment Cancellation Request | MT192 / MT292 |
-| camt.029 | Resolution of Investigation | MT196 / MT296 |
-| camt.060 | Account Reporting Request | MT920 |
-| camt.057 | Notification to Receive | MT210 |
+| camt.056 | FI to FI Payment Cancellation Request      | MT192 / MT292 |
+| camt.029 | Resolution of Investigation                | MT196 / MT296 |
+| camt.060 | Account Reporting Request                  | MT920         |
+| camt.057 | Notification to Receive                    | MT210         |
 
 camt.053 is the bridge to CODA (see 2.8): it is the ISO 20022 statement replacing local formats.
 Point out the reconciliation gain: structured remittance info and end-to-end IDs survive the whole chain.
 
 Example camt.054 debit notification to ACME (camt.053 example is in 2.8). The EndToEndId from the
 pain.001 comes back, which is what makes auto-matching work:
+
 ```xml
 <Ntfctn>
   <Acct><Id><IBAN>BE68539007547034</IBAN></Id></Acct>
@@ -214,11 +218,11 @@ pain.001 comes back, which is what makes auto-matching work:
 - Famous ones: MT101, MT103, MT202, MT202COV, MT940, MT942, MT950, MT199.
 - MT94x family (customer cash reporting, the ones corporates actually parse):
 
-  | Message | Name | Purpose | ISO 20022 successor |
-  |---|---|---|---|
-  | MT940 | Customer Statement Message | End-of-day statement: opening/closing balance plus every booked entry | camt.053 |
-  | MT941 | Balance Report | Balances only, no entry detail | camt.052 |
-  | MT942 | Interim Transaction Report | Intraday entries (booked and optionally pending) since last report | camt.052 |
+  | Message | Name                       | Purpose                                                               | ISO 20022 successor |
+  | ------- | -------------------------- | --------------------------------------------------------------------- | ------------------- |
+  | MT940   | Customer Statement Message | End-of-day statement: opening/closing balance plus every booked entry | camt.053            |
+  | MT941   | Balance Report             | Balances only, no entry detail                                        | camt.052            |
+  | MT942   | Interim Transaction Report | Intraday entries (booked and optionally pending) since last report    | camt.052            |
 
   - Sibling worth naming: MT950 Statement Message (FI-to-FI nostro statement, no `:86:` narrative) → camt.053.
   - Key MT940 fields: `:20:` reference, `:25:` account, `:28C:` statement/sequence number, `:60F:`/`:60M:`
@@ -228,7 +232,8 @@ pain.001 comes back, which is what makes auto-matching work:
   - `:86:` is the pitfall: bank-specific dialects (e.g. German `?20`..`?63` subfields) make "MT940 support"
     mean one parser per bank. Strong argument for camt.053's structured remittance data.
   - Example MT942 (intraday, note `:34F:` floor limit, `:13D:` report time, `:90C:` credit count/sum):
-    ```
+
+    ```text
     :20:INTRA-0001
     :25:BE68539007547034
     :28C:00001/001
@@ -238,8 +243,10 @@ pain.001 comes back, which is what makes auto-matching work:
     :86:DUPONT SA +++123/4567/89012+++
     :90C:1EUR250,00
     ```
+
   - Example MT941 (balances only, no `:61:` lines):
-    ```
+
+    ```text
     :20:BAL-0001
     :25:BE68539007547034
     :28:00001/001
@@ -248,10 +255,13 @@ pain.001 comes back, which is what makes auto-matching work:
     :62F:C261124EUR1250,00
     :64:C261124EUR1250,00
     ```
+
   - MT940 example is in 2.8 (German flavour).
+
 - Show a short annotated MT103 snippet vs the equivalent pacs.008 fragment. Best visual in the article.
   Example MT103 (pacs.008 twin in 2.3). Note the 4x35 free-text party fields that CBPR+ addresses replace:
-  ```
+
+  ```text
   {1:F01BANKBEBBAXXX0000000000}{2:I103BANKUS33XXXXN}{3:{121:eb6305c9-1f7f-49de-aed0-16487c27b42d}}{4:
   :20:PAY-2026-0042
   :23B:CRED
@@ -267,6 +277,7 @@ pain.001 comes back, which is what makes auto-matching work:
   :71A:SHA
   -}
   ```
+
 - Status: for cross-border payment instructions on SWIFT, MT is retired since the end of coexistence
   (November 2025). MT still lives on in reporting (MT9xx), trade, securities, and inside many banks' cores
   via translation layers. Verify the exact current scope of the SWIFT retirement before publishing.
@@ -281,6 +292,7 @@ pain.001 comes back, which is what makes auto-matching work:
   Lossy in the MX→MT direction (truncation of rich data). Great "gotcha" section.
 - Example MX envelope on SWIFT: BAH (`head.001`) + Document. `MsgDefIdr` says which message is inside,
   `BizSvc` says which rulebook applies (verify current CBPR+ versions):
+
   ```xml
   <AppHdr xmlns="urn:iso:std:iso:20022:tech:xsd:head.001.001.02">
     <Fr><FIId><FinInstnId><BICFI>BANKBEBBXXX</BICFI></FinInstnId></FIId></Fr>
@@ -307,6 +319,7 @@ pain.001 comes back, which is what makes auto-matching work:
   November 2026. **That is now; verify the exact rule and date at publication time.** Good hook for the
   article ("this month, your free-text addresses start bouncing").
 - Example, the same debtor address three ways (verify current CBPR+ rules):
+
   ```xml
   <!-- unstructured: being phased out -->
   <PstlAdr><AdrLine>RUE DE LA LOI 1</AdrLine><AdrLine>1000 BRUXELLES BE</AdrLine></PstlAdr>
@@ -316,6 +329,7 @@ pain.001 comes back, which is what makes auto-matching work:
   <PstlAdr><StrtNm>Rue de la Loi</StrtNm><BldgNb>1</BldgNb><PstCd>1000</PstCd>
     <TwnNm>Bruxelles</TwnNm><Ctry>BE</Ctry></PstlAdr>
   ```
+
 - Sister guidelines: **HVPS+** (high-value payment systems: T2, CHAPS, Fedwire alignment).
 
 ### 2.8 CODA (Belgium)
@@ -337,17 +351,17 @@ pain.001 comes back, which is what makes auto-matching work:
   fixed-width or tag-based local format → camt.053.
 - Same role in other big European markets (bank → ERP statement import), all moving to camt.053:
 
-  | Country | Format | Shape |
-  |---|---|---|
-  | Belgium | CODA | Fixed-width, 128 chars/line |
-  | France | CFONB 120 | Fixed-width, 120 chars/line |
-  | Germany | MT940/MT942 with `?xx` subfields in `:86:`, via EBICS | SWIFT MT tags |
-  | Spain | Norma 43 (AEB 43) | Fixed-width, 80 chars/line |
-  | Italy | CBI RH | Fixed-width, 120 chars/line |
+  | Country | Format                                                | Shape                       |
+  | ------- | ----------------------------------------------------- | --------------------------- |
+  | Belgium | CODA                                                  | Fixed-width, 128 chars/line |
+  | France  | CFONB 120                                             | Fixed-width, 120 chars/line |
+  | Germany | MT940/MT942 with `?xx` subfields in `:86:`, via EBICS | SWIFT MT tags               |
+  | Spain   | Norma 43 (AEB 43)                                     | Fixed-width, 80 chars/line  |
+  | Italy   | CBI RH                                                | Fixed-width, 120 chars/line |
 
   - Verify line lengths and current bank support before publishing.
   - Small examples, same story in each (opening balance 1,000.00 EUR, one 250.00 credit, closing balance 1,250.00).
-    These only show the record structure: lines are shortened with `…` and the column positions are not exact.
+    These only show the record structure: lines are shortened with `...` and the column positions are not exact.
     Build the article/repo samples from the official specs. Date formats differ: CODA, CFONB and CBI use DDMMYY,
     MT940 and Norma 43 use YYMMDD (all samples: 23 Nov 2026 opening, 24 Nov 2026 booking).
 
@@ -355,44 +369,49 @@ pain.001 comes back, which is what makes auto-matching work:
     defined by the spec): CODA, CFONB 120, Norma 43, CBI RH.
 
     Belgium, CODA (record type = first digit):
-    ```
-    0000024112600005        …ACME NV                   BBRUBEBB   …                  ← header
-    1 …BE68539007547034     EUR0000000001000000231126…               ← old balance
-    21…0000000000250000241126…+++123/4567/89012+++…                ← movement + OGM/VCS
-    8 …BE68539007547034     EUR0000000001250000241126…               ← new balance
-    9 …000004000000000000000000000000250000…                         ← trailer
+
+    ```text
+    0000024112600005        ...ACME NV                   BBRUBEBB   ...  <- header
+    1 ...BE68539007547034     EUR0000000001000000231126...               <- old balance
+    21...0000000000250000241126...+++123/4567/89012+++...                <- movement + OGM/VCS
+    8 ...BE68539007547034     EUR0000000001250000241126...               <- new balance
+    9 ...000004000000000000000000000000250000...                         <- trailer
     ```
 
     France, CFONB 120 (record code `01`/`04`/`07`; the sign is overpunched in the last digit, `{` = +0):
-    ```
-    0130004…EUR2…00012345678…231126…ACME SA…0000000010000{          ← old balance
-    0430004…EUR2…00012345678…241126…VIR SEPA RECU DUPONT…000000002500{ ← movement
-    0730004…EUR2…00012345678…241126…0000000012500{                  ← new balance
+
+    ```text
+    0130004...EUR2...00012345678...231126...ACME SA...0000000010000{              <- old balance
+    0430004...EUR2...00012345678...241126...VIR SEPA RECU DUPONT...000000002500{  <- movement
+    0730004...EUR2...00012345678...241126...0000000012500{                        <- new balance
     ```
 
     Spain, Norma 43 (record codes `11`/`22`/`23`/`33`/`88`, 80 chars):
-    ```
-    11 2100 0418 4502000513 261123 261124 2 00000000100000 978 3 ACME SL   ← account header
-    22 …261124 261124 02 …2 00000000025000 …                               ← movement (2 = credit)
-    23 01 TRANSFERENCIA DUPONT SA INV-2026-001                             ← optional concept
-    33 2100 0418 4502000513 … 00000000125000 978                           ← account totals
-    88 999999999999999999 000004                                           ← file end
+
+    ```text
+    11 2100 0418 4502000513 261123 261124 2 00000000100000 978 3 ACME SL  <- account header
+    22 ...261124 261124 02 ...2 00000000025000 ...                        <- movement (2 = credit)
+    23 01 TRANSFERENCIA DUPONT SA INV-2026-001                            <- optional concept
+    33 2100 0418 4502000513 ... 00000000125000 978                        <- account totals
+    88 999999999999999999 000004                                          <- file end
     ```
 
     Italy, CBI RH (fixed-width, record type in columns 2–3):
-    ```
-     RH…ACME SPA…241126…                         ← file header
-     61…IT60X0542811101000000123456…EUR…+1000,00   ← opening balance
-     62…241126…C…250,00…BONIFICO DUPONT…         ← movement
-     63…INV-2026-001…                            ← movement detail
-     64…EUR…+1250,00                             ← closing balance
-     EF…                                         ← file end
+
+    ```text
+     RH...ACME SPA...241126...                          <- file header
+     61...IT60X0542811101000000123456...EUR...+1000,00  <- opening balance
+     62...241126...C...250,00...BONIFICO DUPONT...      <- movement
+     63...INV-2026-001...                               <- movement detail
+     64...EUR...+1250,00                                <- closing balance
+     EF...                                              <- file end
     ```
 
     **Family 2: SWIFT MT tag-based** (`:tag:` fields, bank-specific `:86:`): MT940/MT942, German flavour shown.
 
     Germany, MT940 with structured `:86:` (`?00` posting text, `?20`–`?29` purpose, `?32` counterparty):
-    ```
+
+    ```text
     :20:STARTUMS
     :25:10020030/1234567890
     :28C:00001/001
@@ -418,6 +437,7 @@ pain.001 comes back, which is what makes auto-matching work:
       </Ntry>
     </Stmt>
     ```
+
 - Nice code demo: parse a CODA file in ~50 lines of Java 25 (records + switch pattern matching on record
   type) and map to the same domain model as camt.053.
 
@@ -447,25 +467,30 @@ pain.001 comes back, which is what makes auto-matching work:
   (most of the EU), **STET** (France), **UK Open Banking** (UK, separate regime post-Brexit).
   These are REST/JSON, but their payment payloads borrow ISO 20022 data elements.
 - Example Berlin Group AIS call (a fintech reads ACME's account; same EndToEndId as the pain.001):
+
   ```http
   GET /v1/accounts/3dc3d5b3-7023/transactions?bookingStatus=booked&dateFrom=2026-11-24
   X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721
   Consent-ID: 1234-wertiq-983
   ```
+
   ```json
   {
     "account": { "iban": "BE68539007547034" },
     "transactions": {
-      "booked": [{
-        "endToEndId": "INV-2026-0042",
-        "bookingDate": "2026-11-24",
-        "transactionAmount": { "currency": "USD", "amount": "-12500.00" },
-        "creditorName": "GLOBEX CORP",
-        "remittanceInformationUnstructured": "INV-2026-0042"
-      }]
+      "booked": [
+        {
+          "endToEndId": "INV-2026-0042",
+          "bookingDate": "2026-11-24",
+          "transactionAmount": { "currency": "USD", "amount": "-12500.00" },
+          "creditorName": "GLOBEX CORP",
+          "remittanceInformationUnstructured": "INV-2026-0042"
+        }
+      ]
     }
   }
   ```
+
 - What is next: **PSD3 + Payment Services Regulation (PSR)** and **FIDA** (Financial Data Access).
   Check legislative status at publication time.
 - Related EU items worth one line each: Instant Payments Regulation (EU) 2024/886 and
