@@ -54,6 +54,10 @@ If the reader leaves with that table in their head, the article worked.
 
 ## 2. The topics, expanded
 
+> Small examples below follow the section 3 story: ACME NV (Brussels) pays GLOBEX CORP (US) USD 12,500.00,
+> EndToEndId `INV-2026-0042`, UETR `eb6305c9-1f7f-49de-aed0-16487c27b42d`. BICs `BANKBEBB`/`BANKUS33` are
+> fictional. Samples are trimmed to show structure; validate against the XSD / usage guideline before reuse.
+
 ### 2.1 ISO 20022 (the foundation)
 
 - International standard for financial messaging, run by ISO TC68, registration authority is SWIFT.
@@ -95,6 +99,39 @@ Key structure of pain.001: `GrpHdr` (group header, message id, control sum, numb
 `PmtInf` (one debtor account, execution date, batch booking) → `CdtTrfTxInf` (each transfer).
 Explain the three levels; it is the first thing developers get wrong.
 
+Example pain.001 (three levels visible):
+```xml
+<CstmrCdtTrfInitn>
+  <GrpHdr>                                          <!-- level 1: the file -->
+    <MsgId>ACME-20261124-01</MsgId><CreDtTm>2026-11-24T09:00:00</CreDtTm>
+    <NbOfTxs>1</NbOfTxs><CtrlSum>12500.00</CtrlSum><InitgPty><Nm>ACME NV</Nm></InitgPty>
+  </GrpHdr>
+  <PmtInf>                                          <!-- level 2: one debtor account + date -->
+    <PmtInfId>BATCH-01</PmtInfId><PmtMtd>TRF</PmtMtd><ReqdExctnDt><Dt>2026-11-24</Dt></ReqdExctnDt>
+    <Dbtr><Nm>ACME NV</Nm></Dbtr>
+    <DbtrAcct><Id><IBAN>BE68539007547034</IBAN></Id></DbtrAcct>
+    <DbtrAgt><FinInstnId><BICFI>BANKBEBB</BICFI></FinInstnId></DbtrAgt>
+    <CdtTrfTxInf>                                   <!-- level 3: each transfer -->
+      <PmtId><EndToEndId>INV-2026-0042</EndToEndId></PmtId>
+      <Amt><InstdAmt Ccy="USD">12500.00</InstdAmt></Amt>
+      <CdtrAgt><FinInstnId><BICFI>BANKUS33</BICFI></FinInstnId></CdtrAgt>
+      <Cdtr><Nm>GLOBEX CORP</Nm></Cdtr>
+      <CdtrAcct><Id><Othr><Id>123456789</Id></Othr></Id></CdtrAcct>
+      <RmtInf><Ustrd>INV-2026-0042</Ustrd></RmtInf>
+    </CdtTrfTxInf>
+  </PmtInf>
+</CstmrCdtTrfInitn>
+```
+
+Example pain.002 rejection (AC04 = closed account):
+```xml
+<TxInfAndSts>
+  <OrgnlEndToEndId>INV-2026-0042</OrgnlEndToEndId>
+  <TxSts>RJCT</TxSts>
+  <StsRsnInf><Rsn><Cd>AC04</Cd></Rsn></StsRsnInf>
+</TxInfAndSts>
+```
+
 ### 2.3 PACS (Payments Clearing and Settlement)
 
 Bank-to-bank (interbank). What travels between banks, through clearing systems or correspondents.
@@ -108,6 +145,30 @@ Bank-to-bank (interbank). What travels between banks, through clearing systems o
 | pacs.003 | FI to FI Customer Direct Debit | (none common) |
 | pacs.010 | Financial Institution Direct Debit | MT204 |
 | pacs.028 | FI to FI Payment Status Request | MT199/MT299 queries |
+
+Example pacs.008 transaction (same payment as the MT103 in 2.5; comments show the MT field it replaces):
+```xml
+<CdtTrfTxInf>
+  <PmtId>
+    <InstrId>PAY-2026-0042</InstrId>                                  <!-- :20: -->
+    <EndToEndId>INV-2026-0042</EndToEndId>                            <!-- no MT home -->
+    <UETR>eb6305c9-1f7f-49de-aed0-16487c27b42d</UETR>                 <!-- {3:{121:}} -->
+  </PmtId>
+  <IntrBkSttlmAmt Ccy="USD">12500.00</IntrBkSttlmAmt>                 <!-- :32A: amount -->
+  <IntrBkSttlmDt>2026-11-24</IntrBkSttlmDt>                           <!-- :32A: date -->
+  <ChrgBr>SHAR</ChrgBr>                                               <!-- :71A:SHA -->
+  <Dbtr><Nm>ACME NV</Nm>                                              <!-- :50K: -->
+    <PstlAdr><StrtNm>Rue de la Loi</StrtNm><BldgNb>1</BldgNb><PstCd>1000</PstCd>
+      <TwnNm>Bruxelles</TwnNm><Ctry>BE</Ctry></PstlAdr></Dbtr>
+  <DbtrAcct><Id><IBAN>BE68539007547034</IBAN></Id></DbtrAcct>
+  <DbtrAgt><FinInstnId><BICFI>BANKBEBB</BICFI></FinInstnId></DbtrAgt>
+  <CdtrAgt><FinInstnId><BICFI>BANKUS33</BICFI></FinInstnId></CdtrAgt>
+  <Cdtr><Nm>GLOBEX CORP</Nm>                                          <!-- :59: -->
+    <PstlAdr><TwnNm>Springfield</TwnNm><CtrySubDvsn>IL</CtrySubDvsn><Ctry>US</Ctry></PstlAdr></Cdtr>
+  <CdtrAcct><Id><Othr><Id>123456789</Id></Othr></Id></CdtrAcct>
+  <RmtInf><Ustrd>INV-2026-0042</Ustrd></RmtInf>                       <!-- :70: -->
+</CdtTrfTxInf>
+```
 
 ### 2.4 CAMT (Cash Management)
 
@@ -125,6 +186,21 @@ Account reporting, notifications, exceptions and investigations.
 
 camt.053 is the bridge to CODA (see 2.8): it is the ISO 20022 statement replacing local formats.
 Point out the reconciliation gain: structured remittance info and end-to-end IDs survive the whole chain.
+
+Example camt.054 debit notification to ACME (camt.053 example is in 2.8). The EndToEndId from the
+pain.001 comes back, which is what makes auto-matching work:
+```xml
+<Ntfctn>
+  <Acct><Id><IBAN>BE68539007547034</IBAN></Id></Acct>
+  <Ntry>
+    <Amt Ccy="USD">12500.00</Amt><CdtDbtInd>DBIT</CdtDbtInd><Sts><Cd>BOOK</Cd></Sts>
+    <BookgDt><Dt>2026-11-24</Dt></BookgDt>
+    <NtryDtls><TxDtls>
+      <Refs><EndToEndId>INV-2026-0042</EndToEndId><UETR>eb6305c9-1f7f-49de-aed0-16487c27b42d</UETR></Refs>
+    </TxDtls></NtryDtls>
+  </Ntry>
+</Ntfctn>
+```
 
 ### 2.5 MT (SWIFT FIN, legacy)
 
@@ -151,7 +227,46 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
     `:62M:` closing booked balance, `:64:` closing available balance, `:65:` forward available balance.
   - `:86:` is the pitfall: bank-specific dialects (e.g. German `?20`..`?63` subfields) make "MT940 support"
     mean one parser per bank. Strong argument for camt.053's structured remittance data.
+  - Example MT942 (intraday, note `:34F:` floor limit, `:13D:` report time, `:90C:` credit count/sum):
+    ```
+    :20:INTRA-0001
+    :25:BE68539007547034
+    :28C:00001/001
+    :34F:EUR0,
+    :13D:2611241030+0100
+    :61:2611241124CR250,00NTRFNONREF
+    :86:DUPONT SA +++123/4567/89012+++
+    :90C:1EUR250,00
+    ```
+  - Example MT941 (balances only, no `:61:` lines):
+    ```
+    :20:BAL-0001
+    :25:BE68539007547034
+    :28:00001/001
+    :13D:2611241700+0100
+    :60F:C261123EUR1000,00
+    :62F:C261124EUR1250,00
+    :64:C261124EUR1250,00
+    ```
+  - MT940 example is in 2.8 (German flavour).
 - Show a short annotated MT103 snippet vs the equivalent pacs.008 fragment. Best visual in the article.
+  Example MT103 (pacs.008 twin in 2.3). Note the 4x35 free-text party fields that CBPR+ addresses replace:
+  ```
+  {1:F01BANKBEBBAXXX0000000000}{2:I103BANKUS33XXXXN}{3:{121:eb6305c9-1f7f-49de-aed0-16487c27b42d}}{4:
+  :20:PAY-2026-0042
+  :23B:CRED
+  :32A:261124USD12500,00
+  :50K:/BE68539007547034
+  ACME NV
+  RUE DE LA LOI 1
+  1000 BRUXELLES BE
+  :59:/123456789
+  GLOBEX CORP
+  SPRINGFIELD IL US
+  :70:INV-2026-0042
+  :71A:SHA
+  -}
+  ```
 - Status: for cross-border payment instructions on SWIFT, MT is retired since the end of coexistence
   (November 2025). MT still lives on in reporting (MT9xx), trade, securities, and inside many banks' cores
   via translation layers. Verify the exact current scope of the SWIFT retirement before publishing.
@@ -164,6 +279,21 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
   more precise phrasing.
 - Translation: SWIFT publishes MT↔MX translation rules; in-flow translation was offered during coexistence.
   Lossy in the MX→MT direction (truncation of rich data). Great "gotcha" section.
+- Example MX envelope on SWIFT: BAH (`head.001`) + Document. `MsgDefIdr` says which message is inside,
+  `BizSvc` says which rulebook applies (verify current CBPR+ versions):
+  ```xml
+  <AppHdr xmlns="urn:iso:std:iso:20022:tech:xsd:head.001.001.02">
+    <Fr><FIId><FinInstnId><BICFI>BANKBEBBXXX</BICFI></FinInstnId></FIId></Fr>
+    <To><FIId><FinInstnId><BICFI>BANKUS33XXX</BICFI></FinInstnId></FIId></To>
+    <BizMsgIdr>PAY-2026-0042</BizMsgIdr>
+    <MsgDefIdr>pacs.008.001.08</MsgDefIdr>
+    <BizSvc>swift.cbprplus.02</BizSvc>
+    <CreDt>2026-11-24T09:05:00Z</CreDt>
+  </AppHdr>
+  <Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
+    <FIToFICstmrCdtTrf><GrpHdr>…</GrpHdr><CdtTrfTxInf>…see 2.3…</CdtTrfTxInf></FIToFICstmrCdtTrf>
+  </Document>
+  ```
 
 ### 2.7 CBPR+ (Cross-Border Payments and Reporting Plus)
 
@@ -176,6 +306,16 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
 - Structured / hybrid postal address requirements: fully unstructured addresses phased out around
   November 2026. **That is now; verify the exact rule and date at publication time.** Good hook for the
   article ("this month, your free-text addresses start bouncing").
+- Example, the same debtor address three ways (verify current CBPR+ rules):
+  ```xml
+  <!-- unstructured: being phased out -->
+  <PstlAdr><AdrLine>RUE DE LA LOI 1</AdrLine><AdrLine>1000 BRUXELLES BE</AdrLine></PstlAdr>
+  <!-- hybrid: town + country structured, max 2 address lines -->
+  <PstlAdr><TwnNm>Bruxelles</TwnNm><Ctry>BE</Ctry><AdrLine>Rue de la Loi 1</AdrLine></PstlAdr>
+  <!-- fully structured: the target -->
+  <PstlAdr><StrtNm>Rue de la Loi</StrtNm><BldgNb>1</BldgNb><PstCd>1000</PstCd>
+    <TwnNm>Bruxelles</TwnNm><Ctry>BE</Ctry></PstlAdr>
+  ```
 - Sister guidelines: **HVPS+** (high-value payment systems: T2, CHAPS, Fedwire alignment).
 
 ### 2.8 CODA (Belgium)
@@ -306,6 +446,26 @@ Point out the reconciliation gain: structured remittance info and end-to-end IDs
 - PSD2 itself does not define an API. Market standards fill the gap: **Berlin Group NextGenPSD2**
   (most of the EU), **STET** (France), **UK Open Banking** (UK, separate regime post-Brexit).
   These are REST/JSON, but their payment payloads borrow ISO 20022 data elements.
+- Example Berlin Group AIS call (a fintech reads ACME's account; same EndToEndId as the pain.001):
+  ```http
+  GET /v1/accounts/3dc3d5b3-7023/transactions?bookingStatus=booked&dateFrom=2026-11-24
+  X-Request-ID: 99391c7e-ad88-49ec-a2ad-99ddcb1f7721
+  Consent-ID: 1234-wertiq-983
+  ```
+  ```json
+  {
+    "account": { "iban": "BE68539007547034" },
+    "transactions": {
+      "booked": [{
+        "endToEndId": "INV-2026-0042",
+        "bookingDate": "2026-11-24",
+        "transactionAmount": { "currency": "USD", "amount": "-12500.00" },
+        "creditorName": "GLOBEX CORP",
+        "remittanceInformationUnstructured": "INV-2026-0042"
+      }]
+    }
+  }
+  ```
 - What is next: **PSD3 + Payment Services Regulation (PSR)** and **FIDA** (Financial Data Access).
   Check legislative status at publication time.
 - Related EU items worth one line each: Instant Payments Regulation (EU) 2024/886 and
