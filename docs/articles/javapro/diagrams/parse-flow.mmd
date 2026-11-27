@@ -1,0 +1,17 @@
+flowchart LR
+    subgraph IN["Input file (docs/samples)"]
+        C["statement.coda<br/>128-char records"]
+        M["statement.mt940<br/>tagged text lines"]
+        X["statement.camt053.xml<br/>ISO 20022 XML"]
+    end
+    C --> C1["Check length = 128<br/>switch on record type<br/>(cols 1-2)"]
+    C1 --> C2["cut() by 1-based positions<br/>sign digit + 3 implied decimals<br/>OGM from type 21"]
+    M --> M1["TAG regex per line<br/>skip block wrappers"]
+    M1 --> M2[":60F/:62F balances<br/>:61: amount, D/C mark<br/>:86: free text, bank dialect"]
+    X --> X1["DOM parse, namespace aware<br/>DOCTYPE rejected (no XXE)"]
+    X1 --> X2["getElementsByTagNameNS('*', ...)<br/>OPBD / CLBD balances<br/>Ntry, Dbtr/Nm, CdtrRefInf/Ref"]
+    C2 --> S(["Statement record<br/>signed BigDecimal, scale 2<br/>LocalDate, digits-only reference"])
+    M2 --> S
+    X2 --> S
+    S --> T{"equals() across<br/>all three?"}
+    T -->|"JUnit 5 and Main"| R["Same statement in all<br/>three formats: true"]

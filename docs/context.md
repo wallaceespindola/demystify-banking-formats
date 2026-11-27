@@ -240,7 +240,7 @@ pain.001 comes back, which is what makes auto-matching work:
     :34F:EUR0,
     :13D:2611241030+0100
     :61:2611241124CR250,00NTRFNONREF
-    :86:DUPONT SA +++123/4567/89012+++
+    :86:DUPONT SA +++123/4567/89002+++
     :90C:1EUR250,00
     ```
 
@@ -315,9 +315,10 @@ pain.001 comes back, which is what makes auto-matching work:
   Published on SWIFT MyStandards. Validation against plain ISO XSD is not enough; you need the CBPR+ usage
   guideline (or a library implementing it).
 - Coexistence: started March 2023, ended November 2025 for payment instructions (MT103/MT202 family).
-- Structured / hybrid postal address requirements: fully unstructured addresses phased out around
-  November 2026. **That is now; verify the exact rule and date at publication time.** Good hook for the
-  article ("this month, your free-text addresses start bouncing").
+- Structured / hybrid postal address requirements: unstructured addresses were due to be rejected from
+  14 November 2026. In August 2026 Swift accepted a request to extend that migration; the deferred SR 2026
+  release moves to 12 June 2027 and the address date is under consultation (checked 2026-11-27, see
+  `docs/spec/PRD-banking-formats-map.md`). Hook for the article: the deadline moved, the work did not.
 - Example, the same debtor address three ways (verify current CBPR+ rules):
 
   ```xml
@@ -344,10 +345,10 @@ pain.001 comes back, which is what makes auto-matching work:
   - `4` free communication
   - `8` new balance
   - `9` trailer
-- Structured communication (Belgian "+++123/4567/89012+++" OGM/VCS reference) parsed for auto-matching.
-- Current version 2.6 (verify). Febelfin pushes CAMT.053 as the successor; many banks deliver both.
+- Structured communication (Belgian "+++123/4567/89002+++" OGM/VCS reference) parsed for auto-matching.
+- Current version 2.7 (2.6 dated February 2018; see the spec file for the source). Febelfin pushes CAMT.053 as the successor; many banks deliver both.
 - Why include it: a concrete example of **national legacy formats** (others: MT940 dialects in the
-  Netherlands and Germany, AEB43 in Spain, CFONB120 in France, BAI2 in the US). The pattern is the same:
+  Netherlands and Germany, Norma 43 (AEB 43) in Spain, CFONB 120 in France, BAI2 in the US). The pattern is the same:
   fixed-width or tag-based local format → camt.053.
 - Same role in other big European markets (bank → ERP statement import), all moving to camt.053:
 
@@ -374,7 +375,7 @@ pain.001 comes back, which is what makes auto-matching work:
     ```text
     0000024112600005        ...ACME NV                   BBRUBEBB   ...  <- header
     1 ...BE68539007547034     EUR0000000001000000231126...               <- old balance
-    21...0000000000250000241126...+++123/4567/89012+++...                <- movement + OGM/VCS
+    21...0000000000250000241126...+++123/4567/89002+++...                <- movement + OGM/VCS
     8 ...BE68539007547034     EUR0000000001250000241126...               <- new balance
     9 ...000004000000000000000000000000250000...                         <- trailer
     ```

@@ -1,0 +1,20 @@
+flowchart TB
+    REG["Regulation and APIs<br/>PSD2 · Berlin Group · STET · UK Open Banking"]
+    RULES["Usage rules<br/>CBPR+ (bank to bank, cross-border) · CGI-MP (corporate to bank) · HVPS+"]
+    FAM["Message families<br/>pain (customer → bank) · pacs (bank → bank) · camt (reporting)"]
+    STD["Standard<br/>ISO 20022: data dictionary + message catalogue"]
+    SYN["Syntax on Swift<br/>MX = ISO 20022 XML · MT = legacy FIN text"]
+    NAT["National and legacy files<br/>CODA · CFONB 120 · MT940 dialects · Norma 43 · CBI RH"]
+
+    REG -. "payloads borrow ISO 20022 data" .-> FAM
+    RULES -- "restrict" --> FAM
+    FAM -- "defined by" --> STD
+    FAM -- "sent as" --> SYN
+    NAT -- "replaced by camt.053" --> FAM
+
+    classDef std fill:#0f766e,color:#ffffff,stroke:#0f766e
+    classDef layer fill:#ecfdf9,color:#0b1530,stroke:#14b8a6
+    classDef legacy fill:#f1f5f9,color:#1e293b,stroke:#64748b,stroke-dasharray: 4 3
+    class STD std
+    class FAM,RULES,SYN,REG layer
+    class NAT legacy

@@ -1,0 +1,12 @@
+%%{init: {"theme": "base", "flowchart": {"wrappingWidth": 360}, "themeVariables": {"fontSize": "18px", "fontFamily": "Helvetica, Arial, sans-serif", "primaryColor": "#e8f1fb", "primaryBorderColor": "#1f5f99", "primaryTextColor": "#10263d", "lineColor": "#1f5f99"}}}%%
+flowchart TD
+    A["<b>1. Inventory the formats</b><br/>Which files and messages do we really consume?<br/>MT940, CODA, camt.053, pain, pacs, APIs"]
+    B["<b>2. One canonical model</b><br/>One Statement model in the core<br/>One adapter per format at the edge"]
+    C["<b>3. Own address data</b><br/>Structured addresses at the source<br/>Town and country in their own fields"]
+    D["<b>4. Watch PSD3 and PSR</b><br/>Agreed, not yet in force<br/>Keep a dated watch list"]
+    P["<b>Pilot</b><br/>One account, two formats in parallel<br/>Compare the canonical output daily"]
+    M["<b>Measure</b><br/>Formats in use, adapter coverage<br/>Address completeness, reconciliation breaks"]
+    A --> B --> C --> D
+    B --> P --> M
+    C --> M
+    M -. "review each quarter" .-> A

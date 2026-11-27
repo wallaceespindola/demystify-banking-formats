@@ -1,0 +1,29 @@
+flowchart TD
+    A["Business day closes"] --> B["Old feed arrives<br/>(CODA or MT940)"]
+    A --> C["New feed arrives<br/>(camt.053)"]
+    B --> D["Old adapter<br/>to Statement"]
+    C --> E["New adapter<br/>to Statement"]
+    D --> F{"Statements<br/>equal?"}
+    E --> F
+    F -- yes --> G["Record a clean day"]
+    F -- no --> H["Classify the difference"]
+    H --> I["Adapter bug:<br/>fix and replay"]
+    H --> J["Bank data issue:<br/>raise with the bank"]
+    H --> K["Expected difference:<br/>document the rule"]
+    I --> R["Next business day:<br/>run again"]
+    J --> R
+    K --> R
+    G --> L{"Exit gate met?<br/>agreed clean days,<br/>no open differences"}
+    L -- no --> R
+    L -- yes --> M["Switch consumers<br/>to the new feed"]
+    M --> N["Keep old feed as shadow,<br/>then decommission"]
+
+    classDef feed fill:#FEF3C7,stroke:#B45309,color:#000
+    classDef adapter fill:#DBEAFE,stroke:#1D4ED8,color:#000
+    classDef gate fill:#FCE7F3,stroke:#BE185D,color:#000
+    classDef ok fill:#DCFCE7,stroke:#15803D,color:#000
+    class B,C feed
+    class D,E adapter
+    class F,L gate
+    class G,M,N ok
+    class R adapter

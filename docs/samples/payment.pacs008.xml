@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.08">
+  <FIToFICstmrCdtTrf>
+    <GrpHdr>
+      <MsgId>BANKBEBB-20261124-0042</MsgId>
+      <CreDtTm>2026-11-24T09:05:00Z</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <SttlmInf><SttlmMtd>INDA</SttlmMtd></SttlmInf>
+    </GrpHdr>
+    <CdtTrfTxInf>
+      <PmtId>
+        <InstrId>PAY-2026-0042</InstrId>
+        <EndToEndId>INV-2026-0042</EndToEndId>
+        <UETR>eb6305c9-1f7f-49de-aed0-16487c27b42d</UETR>
+      </PmtId>
+      <IntrBkSttlmAmt Ccy="USD">12500.00</IntrBkSttlmAmt>
+      <IntrBkSttlmDt>2026-11-24</IntrBkSttlmDt>
+      <ChrgBr>SHAR</ChrgBr>
+      <InstgAgt><FinInstnId><BICFI>BANKBEBB</BICFI></FinInstnId></InstgAgt>
+      <InstdAgt><FinInstnId><BICFI>BANKUS33</BICFI></FinInstnId></InstdAgt>
+      <Dbtr>
+        <Nm>ACME NV</Nm>
+        <PstlAdr>
+          <StrtNm>Rue de la Loi</StrtNm>
+          <BldgNb>1</BldgNb>
+          <PstCd>1000</PstCd>
+          <TwnNm>Bruxelles</TwnNm>
+          <Ctry>BE</Ctry>
+        </PstlAdr>
+      </Dbtr>
+      <DbtrAcct><Id><IBAN>BE68539007547034</IBAN></Id></DbtrAcct>
+      <DbtrAgt><FinInstnId><BICFI>BANKBEBB</BICFI></FinInstnId></DbtrAgt>
+      <CdtrAgt><FinInstnId><BICFI>BANKUS33</BICFI></FinInstnId></CdtrAgt>
+      <Cdtr>
+        <Nm>Globex Corporation International Holdings LLC</Nm>
+        <PstlAdr>
+          <StrtNm>North Industrial Park Boulevard</StrtNm>
+          <BldgNb>1200</BldgNb>
+          <PstCd>62701</PstCd>
+          <TwnNm>Springfield</TwnNm>
+          <CtrySubDvsn>IL</CtrySubDvsn>
+          <Ctry>US</Ctry>
+        </PstlAdr>
+      </Cdtr>
+      <CdtrAcct><Id><Othr><Id>123456789</Id></Othr></Id></CdtrAcct>
+      <RmtInf>
+        <Ustrd>INV-2026-0042 Consulting services Q4 2026, project Atlas, milestone 3 of 4, PO 7781-AX, contact accounts payable for questions</Ustrd>
+      </RmtInf>
+    </CdtTrfTxInf>
+  </FIToFICstmrCdtTrf>
+</Document>

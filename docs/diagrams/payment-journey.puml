@@ -1,0 +1,23 @@
+@startuml payment-journey
+!theme plain
+skinparam shadowing false
+skinparam dpi 160
+skinparam defaultFontName Arial
+skinparam sequenceMessageAlign left
+title One payment, every layer
+
+participant "ACME ERP" as ERP
+participant "Belgian bank\nBANKBEBB" as BE
+participant "US bank\nBANKUS33" as US
+participant "GLOBEX" as GL
+participant "Fintech app\n(PSD2 AIS)" as APP
+
+ERP -> BE : pain.001 (CGI-MP)\nEndToEndId INV-2026-0042
+BE --> ERP : pain.002 accepted
+BE -> US : pacs.008 on Swift (CBPR+)\nUETR eb6305c9-...
+US -> GL : credit USD 12,500.00
+BE --> ERP : camt.054 debit notification
+BE --> ERP : camt.053 end of day\n(or CODA / MT940 for older ERPs)
+APP -> BE : GET /v1/accounts/{id}/transactions
+BE --> APP : JSON, same EndToEndId
+@enduml

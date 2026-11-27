@@ -1,0 +1,82 @@
+@startuml examples-classes
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam class {
+  BackgroundColor #F7F9FC
+  BorderColor #2B4C7E
+  ArrowColor #2B4C7E
+}
+hide empty members
+title com.wallaceespindola.bankingformats
+
+class Statement <<record>> {
+  iban : String
+  currency : String
+  openingBalance : BigDecimal
+  openingDate : LocalDate
+  closingBalance : BigDecimal
+  closingDate : LocalDate
+  entries : List<Entry>
+}
+class "Statement.Entry" as Entry <<record>> {
+  bookingDate : LocalDate
+  amount : BigDecimal
+  counterparty : String
+  reference : String
+}
+class CodaParser <<final>> {
+  + parse(List<String>) : Statement
+  - cut(line, from, to) : String
+  - amount(char, String) : BigDecimal
+  - structuredReference(String) : String
+}
+class "CodaParser.Movement" as Movement <<record>> {
+  amount : BigDecimal
+  bookingDate : LocalDate
+  reference : String
+  toEntry(counterparty) : Entry
+}
+class Mt940Parser <<final>> {
+  - TAG, BALANCE, LINE_61, OGM : Pattern
+  + parse(List<String>) : Statement
+  - entry(String[]) : Entry
+}
+class Camt053Parser <<final>> {
+  + parse(InputStream) : Statement
+  - balance(Element, code) : Element
+  - first(Element, localName) : Element
+}
+class Pacs008ToMt103 <<final>> {
+  - LINE = 35
+  - NOT_X_CHARSET : Pattern
+  + translate(InputStream) : Result
+  - party(...) : List<String>
+  - lines(...) : List<String>
+}
+class "Pacs008ToMt103.Result" as Result <<record>> {
+  mt103 : String
+  losses : List<String>
+}
+class Main <<final>> {
+  + main(String[])
+}
+
+Statement *-- "0..*" Entry
+CodaParser ..> Statement : creates
+Mt940Parser ..> Statement : creates
+Camt053Parser ..> Statement : creates
+CodaParser +-- Movement
+Movement ..> Entry : builds
+Pacs008ToMt103 ..> Result : returns
+Main --> CodaParser
+Main --> Mt940Parser
+Main --> Camt053Parser
+Main --> Pacs008ToMt103
+
+note bottom of Pacs008ToMt103
+  Separate concern: payment
+  translation, no Statement involved
+end note
+@enduml

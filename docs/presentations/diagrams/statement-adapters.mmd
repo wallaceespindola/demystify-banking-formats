@@ -1,0 +1,17 @@
+flowchart LR
+    CODA["statement.coda<br/>fixed width, 128 chars"] --> CP["CodaParser<br/>positions"]
+    MT["statement.mt940<br/>tags, free-text :86:"] --> MP["Mt940Parser<br/>tags + regex"]
+    CAMT["statement.camt053.xml<br/>ISO 20022 XML"] --> XP["Camt053Parser<br/>DOM, XXE off"]
+    CP --> S["Statement record<br/>iban · currency · balances · entries"]
+    MP --> S
+    XP --> S
+    S --> R["Reconciliation<br/>one model, one set of tests"]
+
+    classDef legacy fill:#f1f5f9,color:#1e293b,stroke:#64748b,stroke-dasharray: 4 3
+    classDef iso fill:#ecfdf9,color:#0b1530,stroke:#14b8a6
+    classDef parser fill:#ffffff,color:#0b1530,stroke:#6366f1
+    classDef model fill:#0f766e,color:#ffffff,stroke:#0f766e
+    class CODA,MT legacy
+    class CAMT iso
+    class CP,MP,XP parser
+    class S,R model

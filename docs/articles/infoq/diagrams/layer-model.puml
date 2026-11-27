@@ -1,0 +1,42 @@
+@startuml layer-model
+skinparam dpi 160
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam roundCorner 12
+skinparam ArrowColor #334155
+skinparam rectangle {
+  BorderThickness 1.5
+}
+left to right direction
+
+rectangle "Access regulation\nPSD2 today, PSD3 and PSR agreed\n(who may call which API)" as REG #F3E8FF;line:6B21A8
+
+rectangle "Usage rules (profiles)\nCBPR+ | CGI-MP | HVPS+\n(fields, lengths, code lists)" as RULES #FEF3C7;line:B45309
+
+rectangle "ISO 20022 business model\nand data dictionary\n\nmessage definitions:\npain | pacs | camt" as CORE #0F766E;text:white;line:0F766E
+
+package "Representations of the same data" as REP #F8FAFC {
+  rectangle "ISO 20022 XML\n(MX on Swift, SEPA, T2)" as XML #ECFDF5;line:0F766E
+  rectangle "JSON payloads in\naccount and payment APIs" as JSON #ECFDF5;line:0F766E
+  rectangle "MT FIN text\n(MT103, MT940)" as MT #F1F5F9;line:64748B
+  rectangle "National fixed-width files\n(CODA, CFONB 120, Norma 43)" as NAT #F1F5F9;line:64748B
+}
+
+RULES --> CORE : constrain
+REG ..> JSON : governs access to
+CORE --> XML : full fidelity
+CORE ..> JSON : borrows data elements
+CORE -[#B91C1C,dashed]-> MT : lossy translation
+CORE -[#B91C1C,dashed]-> NAT : lossy mapping
+
+legend right
+  |= Colour |= Meaning |
+  | <back:#0F766E><color:white> teal </color></back> | the shared data model (the hub) |
+  | <back:#ECFDF5> light green </back> | representations that keep the full model |
+  | <back:#F1F5F9> grey </back> | legacy representations with fixed field sizes |
+  | <back:#FEF3C7> amber </back> | usage rules that restrict the model per path |
+  | <back:#F3E8FF> violet </back> | regulation: access, not format |
+  | <color:#B91C1C>red dashed</color> | translation that drops or truncates data |
+endlegend
+@enduml

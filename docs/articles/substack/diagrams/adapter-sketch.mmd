@@ -1,0 +1,9 @@
+flowchart LR
+    A["statement.coda<br/>128-character records"] --> PA["CodaParser<br/>positions"]
+    B["statement.mt940<br/>tags :60F: :61: :86:"] --> PB["Mt940Parser<br/>tags + :86: dialect"]
+    C["statement.camt053.xml<br/>ISO 20022 XML"] --> PC["Camt053Parser<br/>DOM, no XXE"]
+    PA --> S(["Statement record<br/>iban, currency, balances, entries"])
+    PB --> S
+    PC --> S
+    S --> R["Reconciliation, ERP import,<br/>everything else"]
+    T{{"Test: all three equal EXPECTED"}} -.-> S

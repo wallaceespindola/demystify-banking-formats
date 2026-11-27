@@ -1,0 +1,62 @@
+@startuml migration-architecture
+skinparam dpi 160
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam roundCorner 10
+skinparam ArrowColor #475569
+skinparam rectangle {
+  BorderColor #334155
+}
+skinparam component {
+  BackgroundColor #DBEAFE
+  BorderColor #1D4ED8
+}
+left to right direction
+title Statement migration behind an anti-corruption layer
+
+rectangle "Bank side (formats change)" as bank #FEF3C7 {
+  file "CODA\n128-char records" as coda
+  file "MT940\ntagged text" as mt940
+  file "camt.053\nISO 20022 XML" as camt
+}
+
+rectangle "Anti-corruption layer (owned by the integration team)" as acl #E0F2FE {
+  component "CodaParser" as cp
+  component "Mt940Parser\n(per-bank :86: dialect)" as mp
+  component "Camt053Parser\n(XXE disabled)" as xp
+}
+
+rectangle "Canonical model" as model #DCFCE7 {
+  card "Statement\n(iban, currency, balances,\nentries)" as stmt
+}
+
+rectangle "Consumers (never see bank formats)" as cons #F1F5F9 {
+  component "Reconciliation\nand matching" as rec
+  component "ERP posting" as erp
+  component "Cash position" as cash
+}
+
+rectangle "Parallel run" as pr #FCE7F3 {
+  component "Comparator\n(old vs new Statement)" as cmp
+}
+
+coda --> cp
+mt940 --> mp
+camt --> xp
+cp --> stmt
+mp --> stmt
+xp --> stmt
+stmt --> rec
+stmt --> erp
+stmt --> cash
+stmt ..> cmp : both feeds\nduring migration
+
+legend right
+  Yellow: bank-owned formats
+  Blue: adapters, one per format
+  Green: the only model consumers use
+  Pink: temporary, removed after cutover
+  Dashed arrow: active only during the parallel run
+endlegend
+@enduml

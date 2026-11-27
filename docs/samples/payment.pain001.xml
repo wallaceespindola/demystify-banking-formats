@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.09">
+  <CstmrCdtTrfInitn>
+    <GrpHdr>
+      <MsgId>ACME-20261124-01</MsgId>
+      <CreDtTm>2026-11-24T09:00:00</CreDtTm>
+      <NbOfTxs>1</NbOfTxs>
+      <CtrlSum>12500.00</CtrlSum>
+      <InitgPty><Nm>ACME NV</Nm></InitgPty>
+    </GrpHdr>
+    <PmtInf>
+      <PmtInfId>BATCH-01</PmtInfId>
+      <PmtMtd>TRF</PmtMtd>
+      <ReqdExctnDt><Dt>2026-11-24</Dt></ReqdExctnDt>
+      <Dbtr><Nm>ACME NV</Nm></Dbtr>
+      <DbtrAcct><Id><IBAN>BE68539007547034</IBAN></Id></DbtrAcct>
+      <DbtrAgt><FinInstnId><BICFI>BANKBEBB</BICFI></FinInstnId></DbtrAgt>
+      <CdtTrfTxInf>
+        <PmtId><EndToEndId>INV-2026-0042</EndToEndId></PmtId>
+        <Amt><InstdAmt Ccy="USD">12500.00</InstdAmt></Amt>
+        <CdtrAgt><FinInstnId><BICFI>BANKUS33</BICFI></FinInstnId></CdtrAgt>
+        <Cdtr>
+          <Nm>Globex Corporation International Holdings LLC</Nm>
+          <PstlAdr>
+            <StrtNm>North Industrial Park Boulevard</StrtNm>
+            <BldgNb>1200</BldgNb>
+            <PstCd>62701</PstCd>
+            <TwnNm>Springfield</TwnNm>
+            <CtrySubDvsn>IL</CtrySubDvsn>
+            <Ctry>US</Ctry>
+          </PstlAdr>
+        </Cdtr>
+        <CdtrAcct><Id><Othr><Id>123456789</Id></Othr></Id></CdtrAcct>
+        <RmtInf><Ustrd>INV-2026-0042</Ustrd></RmtInf>
+      </CdtTrfTxInf>
+    </PmtInf>
+  </CstmrCdtTrfInitn>
+</Document>

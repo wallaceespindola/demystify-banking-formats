@@ -1,0 +1,21 @@
+flowchart TD
+    START(["You open a file from the bank"]) --> Q1{"How does it start?"}
+
+    Q1 -- "&lt;?xml ... &lt;Document xmlns=" --> NS{"Namespace ends in"}
+    Q1 -- "{1:F01... then :20:" --> MT{"Type in the {2:} block"}
+    Q1 -- "fixed-width, 128 chars, line 1 starts with 0" --> CODA["CODA<br/>Belgian statement file<br/>record type = first digit"]
+    Q1 -- "JSON from an HTTPS call" --> API["PSD2 account API<br/>an access channel, not a file format"]
+
+    NS -- "pain.001..." --> PAIN["pain.001<br/>customer to bank payment order<br/>GrpHdr / PmtInf / CdtTrfTxInf"]
+    NS -- "pacs.008..." --> PACS["pacs.008<br/>bank to bank payment (MX on Swift)<br/>check UETR and CBPR+ rules"]
+    NS -- "camt.053..." --> CAMT["camt.053<br/>end-of-day statement<br/>Bal + Ntry blocks"]
+
+    MT -- "103" --> MT103["MT103<br/>legacy customer payment<br/>35-char lines"]
+    MT -- "940" --> MT940["MT940<br/>legacy statement<br/>watch the :86: free text"]
+
+    classDef iso fill:#ecfdf9,color:#0b1530,stroke:#14b8a6
+    classDef legacy fill:#f1f5f9,color:#1e293b,stroke:#64748b,stroke-dasharray: 4 3
+    classDef q fill:#0f766e,color:#ffffff,stroke:#0f766e
+    class PAIN,PACS,CAMT iso
+    class CODA,MT103,MT940,API legacy
+    class Q1,NS,MT q
