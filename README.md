@@ -44,6 +44,7 @@ same payment and the same statement appear in every sample file in this reposito
 | [statement.camt053.xml](docs/samples/statement.camt053.xml) | camt.053.001.08 | Balances, one entry, structured creditor reference |
 | [statement.coda](docs/samples/statement.coda) | CODA | 128-character records, Belgian OGM/VCS reference |
 | [statement.mt940](docs/samples/statement.mt940) | MT940 | Tags, and the free-text `:86:` field |
+| [make-run-output.txt](docs/samples/make-run-output.txt) | `make run` output | What the examples print: the three parsed statements and the MT103 with its loss report |
 
 ## Run the examples
 

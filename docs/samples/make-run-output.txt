@@ -1,0 +1,30 @@
+CODA     -> Statement[iban=BE68539007547034, currency=EUR, openingBalance=1000.00, openingDate=2026-11-23, closingBalance=1250.00, closingDate=2026-11-24, entries=[Entry[bookingDate=2026-11-24, amount=250.00, counterparty=DUPONT SA, reference=123456789002]]]
+MT940    -> Statement[iban=BE68539007547034, currency=EUR, openingBalance=1000.00, openingDate=2026-11-23, closingBalance=1250.00, closingDate=2026-11-24, entries=[Entry[bookingDate=2026-11-24, amount=250.00, counterparty=DUPONT SA, reference=123456789002]]]
+camt.053 -> Statement[iban=BE68539007547034, currency=EUR, openingBalance=1000.00, openingDate=2026-11-23, closingBalance=1250.00, closingDate=2026-11-24, entries=[Entry[bookingDate=2026-11-24, amount=250.00, counterparty=DUPONT SA, reference=123456789002]]]
+Same statement in all three formats: true
+
+{3:{121:eb6305c9-1f7f-49de-aed0-16487c27b42d}}{4:
+:20:PAY-2026-0042
+:23B:CRED
+:32A:261124USD12500,00
+:50K:/BE68539007547034
+ACME NV
+Rue de la Loi 1
+1000 Bruxelles BE
+:59:/123456789
+Globex Corporation International Ho
+North Industrial Park Boulevard 120
+62701 Springfield IL US
+:70:INV-2026-0042 Consulting services Q
+4 2026, project Atlas, milestone 3 
+of 4, PO 7781-AX, contact accounts 
+payable for questions
+:71A:SHA
+-}
+
+Lost in translation:
+  - :50K: structured address (StrtNm, BldgNb, PstCd, TwnNm, Ctry) flattened to free text
+  - :59: name truncated, lost "ldings LLC"
+  - :59: street truncated, lost "0"
+  - :59: structured address (StrtNm, BldgNb, PstCd, TwnNm, Ctry) flattened to free text
+  - EndToEndId INV-2026-0042 has no MT103 field (kept only if the bank maps it to :70:)
