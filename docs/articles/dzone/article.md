@@ -85,7 +85,7 @@ Three decisions in that record carry most of the weight.
 
 **A record, so equality is free.** Java records get `equals` from their components, which is what makes the parallel-run comparison a one-liner. There's a catch: `BigDecimal.equals` compares scale, so `250.0` and `250.00` aren't equal. That's why every adapter in the repo calls `setScale(2)` before building the record. If you skip that, the comparator reports differences that aren't real, and people stop trusting it.
 
-The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId` and an ISO bank transaction code (`PMNT`/`RCDT`/`ESCT`) that the other two formats don't have. The debtor's IBAN is there too, but so is it in CODA record 23, and all three formats carry a value date. `Statement` leaves all of these out. That's a design choice, not a gap in the formats, and in production you'd revisit it (see the trade-offs below).
+The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId` and an ISO bank transaction code (`PMNT`/`RCDT`/`ESCT`) that the other two formats don't have. The debtor's IBAN is in it as well, but also in CODA record 23, and all three formats carry a value date. `Statement` leaves all of these out. For the IBAN and the value date that's a design choice, not a gap in the formats, and in production you'd revisit it (see the trade-offs below).
 
 ## Adapters per format
 
