@@ -513,7 +513,7 @@ pain.001 comes back, which is what makes auto-matching work:
 ### 2.10 PSD2 (Payment Services Directive 2)
 
 - EU Directive (EU) 2015/2366, applied from January 2018; SCA RTS applied from September 2019.
-- **Not a message format.** It is regulation that forced banks to open access to accounts via APIs
+- **Not a message format.** It is an EU directive that forced banks to open access to accounts via APIs
   (XS2A, access to account) for licensed third parties:
   - AISP: Account Information Service Provider
   - PISP: Payment Initiation Service Provider

@@ -7,7 +7,7 @@ Primary zone: Software Design and Architecture. Additional zones: Java, Integrat
 Tags: iso-20022, banking, java, enterprise-integration, migration, design-patterns
 -->
 
-# Running CODA, MT940 and camt.053 side by side: a canonical model for bank statement migration
+# A canonical model for bank statement migration: CODA and MT940 to camt.053
 
 ![Banner for an article on migrating bank statement formats behind one canonical model](banner.jpg)
 
@@ -39,7 +39,7 @@ Here is the MT940 sample from the repo. Look at the `:86:` line, because that's 
 -}
 ```
 
-The counterparty name and the Belgian structured reference sit in one line of text. German banks, for example, split `:86:` into numbered subfields (`?20` to `?29` for the purpose, `?32` for the counterparty), and other banks use their own layouts. (The BICs in these samples, `BANKBEBB` and `BANKUS33`, are fictional.) When downstream matching code reads that text directly, it depends on one bank's dialect of MT940, and the migration has to reproduce that dialect's behavior in a completely different format.
+The counterparty name and the Belgian structured reference sit in one line of text. German banks, for example, split `:86:` into numbered subfields (`?20` to `?29` for the purpose, `?32` for the counterparty), and other banks use their own layouts. (The BIC `BANKBEBB` in the repo's samples is fictional.) When downstream matching code reads that text directly, it depends on one bank's dialect of MT940, and the migration has to reproduce that dialect's behavior in a completely different format.
 
 There is also a timing trap. The Swift [MT/MX coexistence period for cross-border payment instructions ended on 22 November 2025](https://www.swift.com/insights/news/iso-20022-bytes-payments-journey-continues), and it's easy to read that as "MT statements are gone too". That date is about payment instructions. It doesn't set a date for the statement file your ERP imports, and in my view a statement migration is usually paced by the bank's product plans and your own platform work. That's another reason to treat it as a controlled change rather than a regulatory fire drill.
 
@@ -85,11 +85,11 @@ Three decisions in that record carry most of the weight.
 
 **A record, so equality is free.** Java records get `equals` from their components, which is what makes the parallel-run comparison a one-liner. There's a catch: `BigDecimal.equals` compares scale, so `250.0` and `250.00` aren't equal. That's why every adapter in the repo calls `setScale(2)` before building the record. If you skip that, the comparator reports differences that aren't real, and people stop trusting it.
 
-The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId`, the debtor's IBAN and a bank transaction code (`PMNT`/`RCDT`/`ESCT`). CODA and MT940 don't carry them in the same shape, so they aren't in `Statement`. That's a design choice, and in production you'd revisit it (see the trade-offs below).
+The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId` and an ISO bank transaction code (`PMNT`/`RCDT`/`ESCT`) that the other two formats don't have. The debtor's IBAN is there too, but so is it in CODA record 23, and all three formats carry a value date. `Statement` leaves all of these out. That's a design choice, not a gap in the formats, and in production you'd revisit it (see the trade-offs below).
 
 ## Adapters per format
 
-Each adapter is a plain class that takes the raw input and returns `Statement`. The repo has three: `CodaParser` reads fixed positions with a `switch` on the record type, `Mt940Parser` reads tags with regular expressions, and `Camt053Parser` uses the JDK DOM parser with namespaces ignored by version and DOCTYPE declarations disabled (no XXE). The comment at the top of the MT940 adapter says plainly where the risk sits:
+Each adapter is a plain class that takes the raw input and returns `Statement`. The repo has three: `CodaParser` reads fixed positions with a `switch` on the record type, `Mt940Parser` reads tags with regular expressions, and `Camt053Parser` uses the JDK DOM parser, matching elements by local name so any camt.053 version namespace works, with DOCTYPE declarations disabled (no XXE). The comment at the top of the MT940 adapter says plainly where the risk sits:
 
 ```java
 /**
@@ -204,7 +204,7 @@ The part I'd want an architect to check is the model owner role. Without it, `St
 
 ## Trade-offs and where it doesn't pay off
 
-The canonical model is a lowest common denominator by default. That's the main cost. camt.053 carries more than CODA or MT940: the `EndToEndId`, the debtor's account, bank transaction codes, separate booking and value dates, and more structured remittance data. If your reconciliation would match better with those fields, a model limited to what the old formats can supply leaves value on the table. The way out is to version the model: run the migration against the small model, and only after the old feed is gone extend `Statement` with what camt.053 alone provides. Don't try to do both at once.
+The canonical model is a lowest common denominator by default. That's the main cost. All three formats carry more than `Statement` keeps: value dates, transaction codes and the counterparty account exist in CODA and MT940 too, in their own shapes. What camt.053 adds is the `EndToEndId`, ISO bank transaction codes (domain, family, sub-family) and structured remittance data. If your reconciliation would match better with those fields, a model limited to what every format can supply leaves value on the table. The way out is to version the model: run the migration against the small model, and only after the old feed is gone extend `Statement` with what camt.053 alone provides. Don't try to do both at once.
 
 The parallel run costs money and attention. Two feeds per account, a daily comparison and a person who reads its output. For a handful of accounts at one bank, a careful cutover with a few historical days replayed may be enough.
 

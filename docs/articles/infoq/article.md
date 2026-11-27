@@ -1,5 +1,5 @@
 <!--
-Meta description: How banking message standards converged from national fixed-width files and Swift MT to ISO 20022, why the result is a layered stack, where translation loses data and what comes next.
+Meta description: How banking formats converged on ISO 20022 as a layered stack, where translating back to MT or fixed-width files loses data, and what comes next.
 Tags: ISO 20022, payments architecture, Swift MT, CBPR+, camt.053, PSD3, data migration, integration patterns
 -->
 
@@ -68,7 +68,7 @@ The move from MT to ISO 20022 did not happen in one event. Market infrastructure
 
 *Figure 1: Dated milestones, grouped by track. Blue: regulation and national files. Teal: market infrastructures. Brown: Swift cross-border and EU payment rules. Violet: changes that are agreed, scheduled or deferred.*
 
-The high-value systems went first. The Eurosystem's T2 migrated in March 2023 and the Bank of England's CHAPS in June 2023. In the United States, Fedwire Funds [moved to ISO 20022 in a single-day cutover on 14 July 2025](https://frbservices.org/news/press-releases/071525-iso20022-migration-announcement), a different strategy from the coexistence periods used elsewhere.
+The high-value systems went first. The Eurosystem's [T2 replaced TARGET2 on ISO 20022 in March 2023](https://www.ecb.europa.eu/press/pr/date/2023/html/ecb.pr230321~f5c7bddf6d.en.html) and the Bank of England [moved CHAPS on 19 June 2023](https://www.bankofengland.co.uk/news/2023/june/chaps-transitions-to-latest-global-financial-messaging-standard). In the United States, Fedwire Funds [moved to ISO 20022 in a single-day cutover on 14 July 2025](https://frbservices.org/news/press-releases/071525-iso20022-migration-announcement), a different strategy from the coexistence periods used elsewhere.
 
 On the Swift network, MT and MX ran side by side for cross-border payment instructions until [coexistence ended on 22 November 2025](https://www.swift.com/insights/news/iso-20022-bytes-payments-journey-continues). That date is often read as "MT is gone". It is more precise to say that MT is gone as the format for cross-border payment instructions on Swift. Statement formats such as MT940 and the national files are a separate question, decided by banks and their customers, and the camt messages that replace them are explicitly outside some of the rules discussed below.
 
@@ -203,9 +203,10 @@ For architects, the pattern translates into a few concrete choices: one canonica
 - Swift, [ISO 20022 FAQ: removal of unstructured address](https://www.swift.com/standards/iso-20022/iso-20022-faqs/iso-20022-removal-unstructured-address)
 - Febelfin, [Standard CODA 2.7](https://febelfin.be/media/pages/publicaties/2023/febelfin-standaarden-voor-online-bankieren/5d601609cd-1754302976/standard-coda-2.7-en.pdf)
 - Norton Rose Fulbright, [PSD3 and PSR: from provisional agreement to 2026 readiness](https://www.nortonrosefulbright.com/en/knowledge/publications/cedd39c6/psd3-and-psr-from-provisional-agreement-to-2026-readiness)
+- ECB, [T2 goes live, 21 March 2023](https://www.ecb.europa.eu/press/pr/date/2023/html/ecb.pr230321~f5c7bddf6d.en.html)
+- Bank of England, [CHAPS transitions to ISO 20022, June 2023](https://www.bankofengland.co.uk/news/2023/june/chaps-transitions-to-latest-global-financial-messaging-standard)
 - EUR-Lex, [Directive (EU) 2015/2366 (PSD2)](https://eur-lex.europa.eu/eli/dir/2015/2366/oj)
 - EUR-Lex, [Regulation (EU) 2024/886 (Instant Payments Regulation)](https://eur-lex.europa.eu/eli/reg/2024/886/oj)
-- Companion repository with the samples, the Java examples and the diagrams: [github.com/wallaceespindola/demystify-banking-formats](https://github.com/wallaceespindola/demystify-banking-formats)
 
 ## About the author
 
@@ -222,16 +223,3 @@ Contact: [wallace.espindola@gmail.com](mailto:wallace.espindola@gmail.com) · [L
 ---
 
 **Examples repository:** every example in this article (the pacs.008 and MT940 samples, the pacs.008 to MT103 translator and its loss report, the canonical statement model and the diagrams) is in <https://github.com/wallaceespindola/demystify-banking-formats>.
-
-Need more tech insights?
-
-Check out my GitHub, LinkedIn, and Speaker Deck.
-
-Happy coding!
-
-Wallace Espindola, Solution Architect
-
-- GitHub: <https://github.com/wallaceespindola/>
-- LinkedIn: <https://www.linkedin.com/in/wallaceespindola/>
-- Speaker Deck: <https://speakerdeck.com/wallacese>
-- Email: <wallace.espindola@gmail.com>

@@ -16,7 +16,7 @@ Meta description: ISO 20022, pacs, camt, MT, MX, CBPR+, CODA and PSD2 are layers
 
 A developer joins a payments or treasury team and gets a ticket that says something like "support camt.053 next to CODA, and check the MT103 fallback for CBPR+". Every word in that sentence is a format, a rulebook or a network, and none of the onboarding material explains how they relate. So they open a search engine and find vendor pages that sell a converter, usage guidelines that run for hundreds of pages, and forum threads where people argue about "MT vs MX" as if it were a choice between two frameworks.
 
-I think the confusion comes from one wrong assumption. People read the acronyms as a list of competing formats and try to pick a winner. They aren't competing. Each one answers a different question, and once you see which question, most of the noise goes away.
+I think the confusion comes from one wrong assumption. People read the acronyms as a list of competing formats and try to pick a winner. Each one answers a different question, and once you see which question, most of the noise goes away.
 
 This article is the opinion piece in a series on banking formats. It's about why I think the acronyms are layers, how history produced the mess, and the habits I'd like developers to drop. The hands-on parts (the sample files, the parsers, the tests) live in the companion repository, [demystify-banking-formats](https://github.com/wallaceespindola/demystify-banking-formats), which has one payment and one statement written out in every format discussed here, plus a small Java 25 module that parses them.
 
@@ -29,7 +29,7 @@ Here is how I sort them. I'll use one story throughout, the same one the reposit
 - **MT and MX:** syntaxes on the Swift network. They answer "what does it look like on the wire?" MT is the old FIN text format with tags like `:59:`. MX is simply what Swift calls ISO 20022 XML when it travels on Swift.
 - **CBPR+, CGI-MP and HVPS+:** usage rules. They answer "which fields, lengths and codes are allowed on this path?" CBPR+ restricts ISO 20022 messages for cross-border bank to bank traffic, CGI-MP does the same for corporate to bank. They don't add new messages, they narrow existing ones.
 - **CODA, CFONB 120, Norma 43, CBI RH and the MT940 dialects:** national and legacy statement files. They answer "what does my ERP still import?" CODA is the Belgian one. camt.053 is the message meant to replace all of them.
-- **PSD2:** a regulation, [Directive (EU) 2015/2366](https://eur-lex.europa.eu/eli/dir/2015/2366/oj). It answers "who may access the account, and how?" It opened account information and payment initiation APIs (Berlin Group NextGenPSD2 and STET are two common API standards in Europe). It isn't a message format at all.
+- **PSD2:** an EU directive, [Directive (EU) 2015/2366](https://eur-lex.europa.eu/eli/dir/2015/2366/oj). It answers "who may access the account, and how?" It opened account information and payment initiation APIs (Berlin Group NextGenPSD2 and STET are two common API standards in Europe). It isn't a message format at all.
 
 Drawn as a picture, it looks like this:
 
@@ -47,7 +47,7 @@ Statements went their own way in each country. Belgium had CODA, France CFONB 12
 
 ISO 20022 arrived as the attempt to describe all of this with one data model. The important word is model. It doesn't just define an XML file, it defines the business concepts (a debtor, a creditor, a postal address with a street, a building number, a town and a country) and then lets messages and syntaxes be built on top. That is why it can sit under pain, pacs, camt and, indirectly, under PSD2 APIs at the same time.
 
-Then the big switch happened in slow motion. In Europe and the UK, T2 (the Eurosystem's payment system) migrated in March 2023 and CHAPS in June 2023. In the US, [Fedwire Funds moved to ISO 20022 in a single-day cutover on 14 July 2025](https://frbservices.org/news/press-releases/071525-iso20022-migration-announcement). On Swift, [MT/MX coexistence for cross-border payment instructions ended on 22 November 2025](https://www.swift.com/insights/news/iso-20022-bytes-payments-journey-continues).
+Then the big switch happened in slow motion. In Europe and the UK, T2 (the Eurosystem's payment system) [replaced TARGET2 on ISO 20022 in March 2023](https://www.ecb.europa.eu/press/pr/date/2023/html/ecb.pr230321~f5c7bddf6d.en.html) and [CHAPS followed on 19 June 2023](https://www.bankofengland.co.uk/news/2023/june/chaps-transitions-to-latest-global-financial-messaging-standard). In the US, [Fedwire Funds moved to ISO 20022 in a single-day cutover on 14 July 2025](https://frbservices.org/news/press-releases/071525-iso20022-migration-announcement). On Swift, [MT/MX coexistence for cross-border payment instructions ended on 22 November 2025](https://www.swift.com/insights/news/iso-20022-bytes-payments-journey-continues).
 
 ![Timeline from the MT era to ISO 20022: MT text on Swift FIN and national files such as CODA, CFONB 120 and Norma 43; CODA 2.6 in February 2018 with 2.7 current; T2 migrating in March 2023 and CHAPS in June 2023; Fedwire Funds cutover on 14 July 2025; Swift MT/MX coexistence ending for payment instructions on 22 November 2025; Swift agreeing in August 2026 to extend the structured address migration; the original 14 November 2026 unstructured address deadline deferred; the deferred SR 2026 release on 12 June 2027](diagrams/mt-to-iso20022-timeline.png)
 
@@ -61,7 +61,7 @@ Under CBPR+, [unstructured postal addresses were due to be rejected from 14 Nove
 
 I read the delay as good news for anyone who hasn't started, and as a trap for anyone who thinks the work went away with the date. Unstructured addresses in a customer master still have to be split into street, building number, town and country by someone.
 
-Regulation keeps adding its own layer on top. [Verification of Payee became mandatory for euro credit transfers in the eurozone on 9 October 2025](https://eur-lex.europa.eu/eli/reg/2024/886/oj), under the Instant Payments Regulation. PSD3 and the Payment Services Regulation reached a [provisional political agreement on 27 November 2025](https://www.nortonrosefulbright.com/en/knowledge/publications/cedd39c6/psd3-and-psr-from-provisional-agreement-to-2026-readiness). They are agreed, not yet in force. Neither of these is a message format either. They change what has to be checked and exposed, and the data they need comes from the same ISO 20022 fields.
+Regulation keeps adding its own layer on top. [Verification of Payee became mandatory for euro credit transfers in the eurozone on 9 October 2025](https://eur-lex.europa.eu/eli/reg/2024/886/oj), under the Instant Payments Regulation. PSD3 and the Payment Services Regulation reached a [provisional political agreement on 27 November 2025](https://www.nortonrosefulbright.com/en/knowledge/publications/cedd39c6/psd3-and-psr-from-provisional-agreement-to-2026-readiness). They are agreed, not yet in force. Both change what has to be checked and exposed, and the data they need comes from the same ISO 20022 fields.
 
 I don't have adoption numbers for any of this, and I won't invent any. What I can say is that the dates above are the ones the operators and regulators published, and that they all point the same way: richer, structured data, checked earlier.
 
@@ -71,9 +71,9 @@ None of these habits is stupid, and each made sense at some point. I just think 
 
 ### Stop treating "MT vs MX" as the question
 
-"MT vs MX" sounds like a technology choice. It isn't one, at least not for new cross-border payment instructions on Swift, where coexistence has ended. The question I'd ask instead: how much of the ISO 20022 data model does your system keep?
+"MT vs MX" sounds like a technology choice, but for new cross-border payment instructions on Swift the choice is already made: coexistence has ended. The question I'd ask instead: how much of the ISO 20022 data model does your system keep?
 
-A system can speak perfect MX on the wire and still be MT on the inside, if the first thing it does is flatten the message into an internal record with four 35-character name and address lines. That system has migrated its syntax and none of its data. When I look at a payments design, I care less about which syntax the adapter emits and more about whether the internal model can hold a building number, a town and an end-to-end identifier as separate fields.
+A system can speak perfect MX on the wire and still be MT on the inside, if the first thing it does is flatten the message into an internal record with a few 35-character name and address lines. That system has migrated its syntax and none of its data. When I look at a payments design, I care less about which syntax the adapter emits and more about whether the internal model can hold a building number, a town and an end-to-end identifier as separate fields.
 
 ### Stop translating ISO 20022 back to MT and calling it equivalent
 
@@ -134,7 +134,7 @@ Finally, the dates. Several of them are still moving. The structured address tim
 
 Here is what I think, in short:
 
-- The acronyms are layers of one stack, not competitors. ISO 20022 is the standard, pain, pacs and camt are message families, MT and MX are syntaxes on Swift, CBPR+ and CGI-MP are usage rules, CODA and its cousins are national files, and PSD2 is regulation.
+- The acronyms are layers of one stack, not competitors. ISO 20022 is the standard, pain, pacs and camt are message families, MT and MX are syntaxes on Swift, CBPR+ and CGI-MP are usage rules, CODA and its cousins are national files, and PSD2 is an EU directive.
 - History explains the mess. Each format solved the problem of its time, and a long migration means old and new run side by side for years.
 - "MT vs MX" is the wrong question. The right one is how much of the ISO 20022 data model your system keeps internally.
 - Translating ISO 20022 back to MT loses data without warning, and a truncated building number is worse than a truncated name because it still looks valid.

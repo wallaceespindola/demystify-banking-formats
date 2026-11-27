@@ -93,7 +93,7 @@ That "for a while" is exactly where a canonical model pays off. You can switch o
 
 A canonical model means deciding what to drop, and that has a cost.
 
-The repo's `Statement` is deliberately small. Look at the camt.053 sample and you'll find things it drops: the EndToEndId of the payment, the debtor's IBAN, the bank transaction code (`PMNT`, `RCDT`, `ESCT`), the value date. camt.053 carries far more than CODA or MT940 ever did. If your canonical model is the lowest common denominator of your oldest format, you throw away exactly the data the new format was supposed to give you. So the model has to grow with your needs, and fields that only some formats can fill have to be optional, with that rule written down.
+The repo's `Statement` is deliberately small. Look at the camt.053 sample and you'll find things it drops: the EndToEndId of the payment, the debtor's IBAN, the bank transaction code (`PMNT`, `RCDT`, `ESCT`), the value date. Some of that is in the older files too (CODA and MT940 both carry the value date and a transaction code, and CODA has the counterparty account), but the EndToEndId and the ISO transaction codes only arrive with camt.053. If your canonical model is the lowest common denominator of your oldest format, you throw away exactly the data the new format was supposed to give you. So the model has to grow with your needs, and fields that only some formats can fill have to be optional, with that rule written down.
 
 A few more cases where I wouldn't bother:
 

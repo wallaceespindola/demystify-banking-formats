@@ -1,5 +1,5 @@
 ---
-title: "pain, pacs, camt, MT, MX: a developer's field guide to banking formats"
+title: "pain, pacs, camt, MT, MX: a field guide to banking formats"
 published: false
 description: "Open five real-looking bank files (pain.001, pacs.008, CODA, MT940, camt.053), learn what to look at in each and how to tell them apart, then run the Java examples."
 tags: java, fintech, xml, tutorial
@@ -24,7 +24,7 @@ The acronyms aren't competing formats. They answer different questions, and once
 - **MT and MX:** how messages look on the Swift network. MT is the old tag-based text format, MX is ISO 20022 XML on Swift.
 - **CBPR+ and CGI-MP:** usage rules. Same ISO messages, fewer allowed fields and stricter lengths for a given path.
 - **CODA and friends:** national statement files that camt.053 replaces.
-- **PSD2:** a regulation ([Directive (EU) 2015/2366](https://eur-lex.europa.eu/eli/dir/2015/2366/oj)) that opened account APIs. It's not a message format at all.
+- **PSD2:** an EU directive ([Directive (EU) 2015/2366](https://eur-lex.europa.eu/eli/dir/2015/2366/oj)) that opened account APIs. It's not a message format at all.
 
 ## Which format am I looking at?
 
@@ -182,7 +182,7 @@ That's why camt.053 replaces CODA, MT940 and the other national files: each piec
 
 ## Run the examples
 
-Reading files is half the job. The repo has a small Java 25 module in `examples/` (JDK only, JUnit 5 tests) with one parser per statement format and a single `Statement` record they all produce. From the repo root:
+Reading files is half the job. The repo has a small Java 25 module in `examples/` (Java 25 and Maven, no dependencies beyond the JDK, JUnit 5 tests) with one parser per statement format and a single `Statement` record they all produce. From the repo root:
 
 ```bash
 git clone https://github.com/wallaceespindola/demystify-banking-formats.git

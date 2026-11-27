@@ -18,11 +18,11 @@ This article is for the tech lead or engineering manager who owns that integrati
 
 ## The problem leaders see
 
-Most of the confusion starts with the acronyms. ISO 20022 is the standard. pain, pacs and camt are message families inside it (customer to bank, bank to bank, bank to customer). MT and MX are two syntaxes on the Swift network. CBPR+ is a set of usage rules for cross-border payments. CODA, MT940 and the other national files are older statement formats that camt.053 is meant to replace. PSD2 is a regulation for account access, not a format at all.
+Most of the confusion starts with the acronyms. ISO 20022 is the standard. pain, pacs and camt are message families inside it (customer to bank, bank to bank, bank to customer). MT and MX are two syntaxes on the Swift network. CBPR+ is a set of usage rules for cross-border payments. CODA, MT940 and the other national files are older statement formats that camt.053 is meant to replace. PSD2 is an EU directive on payment services, including account access, not a format at all.
 
 When a team treats these as competing formats, every new bank or country becomes a small project of its own: a new parser, a new mapping into the ledger, a new set of reconciliation surprises. When the team treats them as layers of one stack, the same question gets a smaller answer: which layer changed, and which adapter does that touch?
 
-So the decisions below are about structure and ownership. None of them needs a big program.
+So the decisions below are about structure and ownership.
 
 ## Decision 1: inventory what you really consume
 
@@ -39,7 +39,7 @@ Look for two things in it: formats nobody remembered were still in production, a
 
 The structural decision is to keep one internal statement model and put one adapter per format at the edge. Reconciliation, the ledger and reporting read the canonical model only. When a bank moves you from MT940 to camt.053, you add or swap an adapter, and nothing downstream changes.
 
-The repo shows the idea on one small statement (a 250.00 EUR credit from DUPONT SA with a Belgian structured reference). It parses the same statement from CODA, MT940 and camt.053 into one Java record and checks that the three results are equal. The samples are trimmed teaching files, not full bank output, but the last line of `make run` is the property you want in production:
+The repo shows the idea on one small statement (a 250.00 EUR credit from DUPONT SA with a Belgian structured reference). It parses the same statement from CODA, MT940 and camt.053 into one Java record and checks that the three results are equal. The samples are trimmed teaching files, not full bank output, but the line that closes the statement comparison in `make run` is the property you want in production:
 
 ```text
 Same statement in all three formats: true

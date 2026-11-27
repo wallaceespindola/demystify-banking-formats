@@ -16,7 +16,7 @@ The acronyms answer different questions. ISO 20022 is the standard. pain, pacs a
 inside it (customer to bank, bank to bank, bank to customer). MT and MX are syntaxes on the Swift network: the
 old text format and ISO 20022 XML. CBPR+ and CGI-MP are usage rules that restrict the same ISO messages for a
 given path. CODA (and its cousins CFONB 120, Norma 43, CBI RH, MT940) are national or legacy statement files
-that camt.053 replaces. PSD2 is a regulation that opened account APIs, not a message format.
+that camt.053 replaces. PSD2 is an EU directive that opened account APIs, not a message format.
 
 | Layer | Question it answers | Examples |
 | --- | --- | --- |
@@ -67,7 +67,8 @@ Only these dates and versions go into articles. Anything else needs a source fir
 | --- | --- | --- |
 | Swift MT/MX coexistence for cross-border payment instructions ended on 22 November 2025 | Confirmed | [Swift: ISO 20022 in bytes, the journey continues](https://www.swift.com/insights/news/iso-20022-bytes-payments-journey-continues) |
 | Fedwire Funds moved to ISO 20022 in a single-day cutover on 14 July 2025 | Confirmed | [Federal Reserve Financial Services announcement](https://frbservices.org/news/press-releases/071525-iso20022-migration-announcement) |
-| T2 (Eurosystem) migrated in March 2023, CHAPS in June 2023 | Widely documented; cite the operator if stated | none linked |
+| T2 replaced TARGET2 in the Eurosystem on ISO 20022, with migration from 17 to 20 March 2023 | Confirmed | [ECB press release, 21 March 2023](https://www.ecb.europa.eu/press/pr/date/2023/html/ecb.pr230321~f5c7bddf6d.en.html) |
+| CHAPS moved to ISO 20022 on 19 June 2023 | Confirmed | [Bank of England, June 2023](https://www.bankofengland.co.uk/news/2023/june/chaps-transitions-to-latest-global-financial-messaging-standard) |
 | CBPR+ was due to reject unstructured postal addresses from 14 November 2026 (town and country in their own fields at minimum, hybrid allows 2 address lines of 70 characters) | Rule confirmed; the date was deferred | [Swift: removal of unstructured address](https://www.swift.com/standards/iso-20022/removal-unstructured-address) |
 | In August 2026 Swift accepted a community request to extend the structured address migration; the deferred SR 2026 release moves to 12 June 2027, and the address timing is under consultation (update expected by December 2026) | Confirmed; final address date open | [Swift news](https://www.swift.com/news-events/news/swift-accepts-community-request-extend-structured-address-migration-iso-20022-payment-messages), [Finextra](https://www.finextra.com/newsarticle/48318/swift-accepts-request-to-extend-structured-address-migration-for-iso-20022-messages) |
 | camt.052, camt.053 and camt.054 are excluded from the CBPR+ structured address rule | Per Swift FAQ | [Swift FAQ](https://www.swift.com/standards/iso-20022/iso-20022-faqs/iso-20022-removal-unstructured-address) |

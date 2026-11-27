@@ -450,7 +450,7 @@ Lost in translation:
   - EndToEndId INV-2026-0042 has no MT103 field (kept only if the bank maps it to :70:)
 ```
 
-Look at the creditor street: building number `1200` became `North Industrial Park Boulevard 120`. Nothing failed, the line is valid MT, and the address is wrong. The name lost `ldings LLC`, and the `EndToEndId` is gone unless a bank copies it into `:70:`. That's why losses come back as data: a production translator should log or reject on them. `Pacs008ToMt103Test` pins the 35-character limit, the truncated name and the missing `EndToEndId`. The cut also falls mid-word (`Q` / `4 2026`). A real translator would wrap on spaces.
+Look at the creditor street: building number `1200` became `North Industrial Park Boulevard 120`. Nothing failed, the line is valid MT, and the address is wrong. The name lost `ldings LLC`, and the `EndToEndId` is gone unless a bank copies it into `:70:`. That's why losses come back as data: a production translator should log or reject on them. `Pacs008ToMt103Test` pins the 35-character limit, the truncated name and the missing `EndToEndId`. The cut also falls mid-word (`Q` / `4 2026`), as MT does. I'd wrap on spaces so the receiver gets readable lines.
 
 ## Where this design stops
 
@@ -479,7 +479,7 @@ Write the `EXPECTED` object for one real movement and point each of your parsers
 
 ## Author bio
 
-Wallace Espindola is a senior software engineer and solution architect working with Java/Spring Boot, Python/FastAPI and cloud-native microservices on Kubernetes and OpenShift.
+Wallace Espindola is a senior software engineer and solution architect. He designs and builds backend systems in Java/Spring Boot and Python/FastAPI, runs cloud-native microservices on Kubernetes and OpenShift, and works with both relational and NoSQL databases. Most of his work sits where systems meet: integration contracts, message formats, migrations between old and new interfaces, and the architecture diagrams that keep teams aligned on them. He writes about software architecture and Java on Dev.to, Medium, DZone and Substack, publishes his talks on Speaker Deck, and keeps runnable examples for each topic in open-source repositories on GitHub, such as the one behind this article.
 
 Reach him on [LinkedIn](https://www.linkedin.com/in/wallaceespindola/) or check out his projects on [GitHub](https://github.com/wallaceespindola/).
 

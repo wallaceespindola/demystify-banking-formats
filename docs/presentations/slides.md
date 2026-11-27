@@ -163,7 +163,7 @@ This table is the whole talk in one slide.
 ISO 20022 is the standard: a data dictionary and a catalogue of messages. pain, pacs and camt are message families inside it: customer to bank, bank to bank, and reporting back to the customer.
 MT and MX are syntaxes on Swift. MT is the old FIN text format, MX is simply ISO 20022 XML when it travels on Swift.
 CBPR+ and CGI-MP don't add new messages. They restrict the same ISO messages for a given route: CBPR+ for cross-border bank to bank, CGI-MP for corporate to bank.
-CODA and its cousins are national statement files that camt.053 replaces. And PSD2 is a regulation that opened account access through APIs. It's not a message format at all.
+CODA and its cousins are national statement files that camt.053 replaces. And PSD2 is an EU directive that opened account access through APIs. It's not a message format at all.
 -->
 
 ---
@@ -461,7 +461,7 @@ The repo's context notes have a small example of each, with the warning that pos
 
 # PSD2: an access channel, not a format
 
-- **Directive (EU) 2015/2366**: a regulation that opened account access
+- **Directive (EU) 2015/2366**: the EU directive that opened account access
 - Licensed third parties **read** accounts (AIS) and **initiate** payments (PIS)
 - PSD2 defines no API: **Berlin Group NextGenPSD2**, **STET**, UK Open Banking do
 - REST and JSON, with fields borrowed from ISO 20022: `endToEndId`, `creditorName`
