@@ -79,13 +79,13 @@ public record Statement(
 
 Three decisions in that record carry most of the weight.
 
-**Signed amounts.** CODA uses a sign digit, MT940 uses `C`, `D` and `RC`, camt.053 uses `CRDT` and `DBIT`. The model has one rule (credit positive, debit negative), and every adapter converts to it. Consumers never see a credit/debit flag, so they can't get it backwards.
+**Signed amounts.** CODA uses a sign digit, MT940 uses `C`, `D` and the reversals `RC` and `RD`, camt.053 uses `CRDT` and `DBIT`. The model has one rule (credit positive, debit negative), and every adapter converts to it. Consumers never see a credit/debit flag, so they can't get it backwards.
 
 **Normalized references.** The Belgian structured reference appears as `+++123/4567/89002+++` in MT940 text, as 12 digits after a `101` marker in CODA, and as `<Ref>123456789002</Ref>` in camt.053. The model stores digits only. Matching code compares strings without knowing where they came from.
 
 **A record, so equality is free.** Java records get `equals` from their components, which is what makes the parallel-run comparison a one-liner. There's a catch: `BigDecimal.equals` compares scale, so `250.0` and `250.00` aren't equal. That's why every adapter in the repo calls `setScale(2)` before building the record. If you skip that, the comparator reports differences that aren't real, and people stop trusting it.
 
-The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId` and an ISO bank transaction code (`PMNT`/`RCDT`/`ESCT`) that the other two formats don't have. The debtor's IBAN is in it as well, but also in CODA record 23, and all three formats carry a value date. `Statement` leaves all of these out. For the IBAN and the value date that's a design choice, not a gap in the formats, and in production you'd revisit it (see the trade-offs below).
+The model also leaves things out on purpose. The camt.053 sample carries an `EndToEndId` and an ISO bank transaction code (`PMNT`/`RCDT`/`ESCT`) that the other two formats don't have. It also carries the debtor's IBAN, which CODA has in record 23, and all three formats carry a value date. `Statement` leaves all of these out. For the IBAN and the value date that's a design choice, not a gap in the formats, and in production you'd revisit it (see the trade-offs below).
 
 ## Adapters per format
 

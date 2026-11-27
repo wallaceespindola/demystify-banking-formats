@@ -53,6 +53,7 @@ sorted alphabetically. When you introduce a new one, add a row here.
 | EPC | European Payments Council | Owner of the SEPA rulebooks |
 | ERP | Enterprise resource planning | The system that sends pain.001 and imports statements |
 | ES | Spain | Country or region code (ISO 3166) in addresses, IBANs and tables |
+| ESCT | ISO 20022 bank transaction sub-family: SEPA credit transfer | Bank transaction code in the camt.053 sample (`PMNT`/`RCDT`/`ESCT`) |
 | EU | European Union | PSD2, PSD3, PSR, Instant Payments Regulation |
 | EUR | Euro (ISO 4217) | Currency of the statement samples |
 | EURO1 | EBA Clearing's euro high-value payment system | Migrated to ISO 20022 with T2 |
@@ -112,6 +113,7 @@ sorted alphabetically. When you introduce a new one, add a row here.
 | MT942 | Swift message type 942 | Interim transaction report; successor camt.052 |
 | MT950 | Swift message type 950 | Statement message (bank to bank); successor camt.053 |
 | MX | Swift's name for ISO 20022 XML messages | pacs.008 on Swift is an MX message |
+| NTRF | MT940 transaction type: transfer | Transaction type in the `:61:` line of the MT940 sample |
 | NV | Naamloze vennootschap (Belgian public company) | Legal form in the fictional company names of the samples |
 | OGM | Overschrijving met gestructureerde mededeling | Belgian structured reference `+++123/4567/89002+++` (Dutch name) |
 | OPBD | Opening booked balance | Code or record type that appears in the samples |
@@ -123,6 +125,7 @@ sorted alphabetically. When you introduce a new one, add a row here.
 | PDF | Portable Document Format | Deck export for Speaker Deck |
 | PIS | Payment Initiation Service | PSD2 role that starts a payment |
 | PISP | Payment Initiation Service Provider | PSD2 role that starts a payment |
+| PMNT | ISO 20022 bank transaction domain: payments | Bank transaction code in the camt.053 sample |
 | PNG | Portable Network Graphics | Banners and rendered diagrams |
 | PPTX | PowerPoint Open XML presentation | Editable deck for PowerPoint, Keynote and Google Slides |
 | PRD | Product requirements document | `docs/spec/PRD-banking-formats-map.md` |
@@ -131,7 +134,10 @@ sorted alphabetically. When you introduce a new one, add a row here.
 | PSR | Payment Services Regulation | Companion regulation to PSD3 |
 | QSealC | Qualified electronic Seal Certificate | eIDAS certificates that identify PSD2 TPPs |
 | QWAC | Qualified Website Authentication Certificate | eIDAS certificates that identify PSD2 TPPs |
+| RCDT | ISO 20022 bank transaction family: received credit transfers | Bank transaction code in the camt.053 sample |
 | RCUR | Recurring direct debit (sequence type) | Code or record type that appears in the samples |
+| RC | Reversal of credit (MT940 `:61:` mark) | Treated as a debit by `Mt940Parser` |
+| RD | Reversal of debit (MT940 `:61:` mark) | Treated as a credit by `Mt940Parser`; `RC` is a reversal of credit |
 | REST | Representational state transfer | Style of the PSD2 APIs |
 | RH | Rendicontazione (CBI reporting record set) | Italian statement file, written CBI RH |
 | RTS | Regulatory Technical Standards | The PSD2 SCA rules (Regulation (EU) 2018/389) |

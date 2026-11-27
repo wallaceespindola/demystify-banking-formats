@@ -117,7 +117,7 @@ Then clone [the repo](https://github.com/wallaceespindola/demystify-banking-form
 
 ## Wrapping up
 
-Banks will keep sending whatever format they send, and for a while it will be more than one. Your code doesn't have to care. Keep one statement model, push every format quirk into its own adapter, and keep the test that says the adapters agree. When that test prints `true`, the format is just a detail of how the file got to you.
+Banks will keep sending whatever format they send, and for a while it will be more than one. Your code doesn't have to care. Keep one statement model, push every format quirk into its own adapter, and keep the test that says the adapters agree. When those tests pass, the format is just a detail of how the file got to you.
 
 My question for you: how many statement formats does your code read today, and does anything check that they agree? Hit reply or drop a comment. I read every one.
 

@@ -24,7 +24,7 @@ When a team treats these as competing formats, every new bank or country becomes
 
 So the decisions below are about structure and ownership.
 
-## Decision 1: inventory what you really consume
+## Inventory what you really consume
 
 Start with a list, not an architecture. For every bank account and every system that reads bank data, write down:
 
@@ -35,7 +35,7 @@ Start with a list, not an architecture. For every bank account and every system 
 
 Look for two things in it: formats nobody remembered were still in production, and formats parsed in more than one place. The second one is expensive, because each copy of a parser drifts on its own.
 
-## Decision 2: one canonical model behind adapters
+## One canonical model behind adapters
 
 The structural decision is to keep one internal statement model and put one adapter per format at the edge. Reconciliation, the ledger and reporting read the canonical model only. When a bank moves you from MT940 to camt.053, you add or swap an adapter, and nothing downstream changes.
 
@@ -51,7 +51,7 @@ There is a limit. A canonical model only holds what you decide to put in it. MT9
 
 ![Decision roadmap for a tech lead: inventory the formats, put one canonical model behind adapters, own structured address data, watch PSD3 and PSR; a pilot with two formats in parallel feeds the measures, which are reviewed each quarter](diagrams/decision-roadmap.png)
 
-## Decision 3: own address data quality
+## Own address data quality
 
 Under CBPR+, Swift planned to reject fully unstructured postal addresses in payment messages from 14 November 2026. The rule asks at minimum for town and country in their own fields, with a hybrid option that allows two free address lines of 70 characters ([Swift on the removal of unstructured addresses](https://www.swift.com/standards/iso-20022/removal-unstructured-address)). In August 2026 Swift [accepted a community request to extend the migration](https://www.swift.com/news-events/news/swift-accepts-community-request-extend-structured-address-migration-iso-20022-payment-messages): the SR 2026 release moves to 12 June 2027, and the address timing is under consultation, with an update expected by December 2026.
 
@@ -59,7 +59,7 @@ I'd treat that as extra time to fix the data. The problem sits in your master da
 
 So give the address data a named owner, usually in the team that owns supplier and customer master data, and give engineering the job of measuring it. Statements are a separate track here: per the [Swift FAQ](https://www.swift.com/standards/iso-20022/iso-20022-faqs/iso-20022-removal-unstructured-address), camt.052, camt.053 and camt.054 are excluded from the structured address rule.
 
-## Decision 4: keep a dated watch on PSD3 and PSR
+## Keep a dated watch on PSD3 and PSR
 
 PSD2 ([Directive (EU) 2015/2366](https://eur-lex.europa.eu/eli/dir/2015/2366/oj)) is what opened account information APIs. Its successors, PSD3 and the Payment Services Regulation, reached a provisional political agreement on 27 November 2025, and when I checked, they were agreed but not yet in force ([Norton Rose Fulbright's summary](https://www.nortonrosefulbright.com/en/knowledge/publications/cedd39c6/psd3-and-psr-from-provisional-agreement-to-2026-readiness)).
 

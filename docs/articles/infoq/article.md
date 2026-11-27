@@ -29,7 +29,7 @@ Engineers who join a payments, treasury or ERP integration team meet a dense set
 
 The result is a recurring architectural mistake. Teams compare MT940 with camt.053, or "MT with ISO 20022", or "the XML" with PSD2, as if they were rival options on one axis. The acronyms answer different questions: which rulebook defines the data, who is talking to whom, what the bytes look like on a given network, which subset of fields a given path accepts, what an older ERP still imports, and who may access an account at all.
 
-This article looks at how those layers came about, why the convergence on ISO 20022 produced a stack and not a single format, where the stack loses data when it has to translate, and what the next dated changes are. It is an analysis of a pattern, not a migration guide. The examples come from an open repository that follows one payment and one bank statement through every layer, with trimmed teaching samples and a small Java 25 module that parses and translates them. There is no adoption data in that repository, and this article does not offer any percentages or cost figures.
+This article looks at how those layers came about, why the convergence on ISO 20022 produced a stack and not a single format, where the stack loses data when it has to translate, and what the next dated changes are. It analyzes a pattern and leaves migration steps to the bank's implementation guides. The examples come from an open repository that follows one payment and one bank statement through every layer, with trimmed teaching samples and a small Java 25 module that parses and translates them. There is no adoption data in that repository, and this article does not offer any percentages or cost figures.
 
 ## Three generations of bank messages
 
@@ -52,7 +52,7 @@ The weak point of MT for reporting is the `:86:` field of the MT940, the informa
 :86:DUPONT SA +++123/4567/89002+++
 ```
 
-A parser has to know where that bank puts the counterparty name and the reference. In practice that makes "MT940 support" a set of bank-specific parsers rather than one.
+A parser has to know where that bank puts the counterparty name and the reference. In practice "MT940 support" means one parser per bank.
 
 ### ISO 20022: a data model with many representations
 
@@ -151,9 +151,9 @@ Three kinds of loss show up in this small sample, and each has a different conse
 - **Flattening:** the address keeps its text but loses its structure. A system that needs the town or the country as a field now has to parse free text, which is exactly what ISO 20022 set out to remove.
 - **Dropped identifiers:** the EndToEndId, which the payer uses to reconcile the payment with an invoice, has no MT103 field. The UETR survives in the header (block 3, field 121), but the reference the customer cares about depends on the bank's mapping choices.
 
-These losses matter beyond reconciliation. Party names and addresses are inputs to sanctions screening and payment transparency checks, so a truncated or flattened party is a compliance concern as well as a data quality one. The repository does not contain error rates or incident data, and this article does not estimate them. The structural point stands without numbers: any remaining ISO 20022 to MT translation point is a place where data is lost, and the loss is silent unless the translator reports it.
+These losses matter beyond reconciliation. Party names and addresses are inputs to sanctions screening and payment transparency checks, so a truncated or flattened party is a compliance concern as well as a data quality one. The repository does not contain error rates or incident data, and this article does not estimate them. Any remaining ISO 20022 to MT translation point is a place where data is lost, and the loss is silent unless the translator reports it.
 
-For architects, that suggests an inventory exercise. List every place where data moves from the canonical model into a narrower representation, decide whether each one is still needed, and where it is, make the translator emit a loss report like the one above rather than truncating quietly.
+For architects, that suggests an inventory exercise. List every place where data moves from the canonical model into a narrower representation, decide whether each one is still needed, and where it is, make the translator emit a loss report like the one above.
 
 ## Where it goes next
 
@@ -173,7 +173,7 @@ Verification of Payee is a useful precedent for that indirect effect. It is a re
 
 ### APIs borrow ISO 20022 data
 
-The account information and payment initiation APIs that grew out of PSD2 are JSON over HTTP. They are not ISO 20022 messages, but their payloads reuse ISO 20022 data elements, and the repository's diagram marks that relation as "payloads borrow ISO 20022 data". The trend is convergence at the data layer while syntaxes multiply: XML on clearing networks, JSON on APIs and legacy text and fixed-width files where customers still need them.
+The account information and payment initiation APIs that grew out of PSD2 are JSON over HTTP. They are not ISO 20022 messages, but their payloads reuse ISO 20022 data elements, and Figure 2 marks that relation as "borrows data elements". The trend is convergence at the data layer while syntaxes multiply: XML on clearing networks, JSON on APIs and legacy text and fixed-width files where customers still need them.
 
 For an internal architecture, that argues for keeping the canonical model independent of any one syntax, close to the ISO 20022 dictionary in names and structure, with serialization to XML, JSON or legacy files handled at the edges.
 
@@ -191,7 +191,7 @@ The layer model is a simplification, and it has limits worth stating.
 
 Banking message standards converged on a data model rather than on a file format. ISO 20022 sits at the center, usage rules decide what each path accepts, XML and JSON carry the full data, and MT and the national fixed-width files remain as narrower representations that lose information whenever data is pushed into them. Regulation runs beside the stack and shapes it through access obligations.
 
-For architects, the pattern translates into a few concrete choices: one canonical model shaped by the ISO 20022 dictionary, adapters at the edge for each format, validation against the relevant usage rules and an explicit inventory of every lossy translation point. The structured address deferral and the pending PSD3 and PSR texts change the timing of the next steps. The direction stays the same. The companion repository at [github.com/wallaceespindola/demystify-banking-formats](https://github.com/wallaceespindola/demystify-banking-formats) has the samples and the code to explore the pattern on one payment and one statement.
+For architects, the pattern translates into a few concrete choices: one canonical model shaped by the ISO 20022 dictionary, adapters at the edge for each format, validation against the relevant usage rules and an explicit inventory of every lossy translation point. The structured address deferral and the pending PSD3 and PSR texts change the timing of the next steps; the choices above still apply. The companion repository at [github.com/wallaceespindola/demystify-banking-formats](https://github.com/wallaceespindola/demystify-banking-formats) has the samples and the code to explore the pattern on one payment and one statement.
 
 ## References
 
@@ -207,6 +207,7 @@ For architects, the pattern translates into a few concrete choices: one canonica
 - Bank of England, [CHAPS transitions to ISO 20022, June 2023](https://www.bankofengland.co.uk/news/2023/june/chaps-transitions-to-latest-global-financial-messaging-standard)
 - EUR-Lex, [Directive (EU) 2015/2366 (PSD2)](https://eur-lex.europa.eu/eli/dir/2015/2366/oj)
 - EUR-Lex, [Regulation (EU) 2024/886 (Instant Payments Regulation)](https://eur-lex.europa.eu/eli/reg/2024/886/oj)
+**Examples repository:** every example in this article (the pacs.008 and MT940 samples, the pacs.008 to MT103 translator and its loss report, the canonical statement model and the diagrams) is in <https://github.com/wallaceespindola/demystify-banking-formats>.
 
 ## About the author
 
@@ -219,7 +220,3 @@ Contact: [wallace.espindola@gmail.com](mailto:wallace.espindola@gmail.com) · [L
 ---
 
 **Publishing note**: This article is submitted for InfoQ's 4-week exclusive publishing window. It will not be cross-posted to other platforms until that window closes.
-
----
-
-**Examples repository:** every example in this article (the pacs.008 and MT940 samples, the pacs.008 to MT103 translator and its loss report, the canonical statement model and the diagrams) is in <https://github.com/wallaceespindola/demystify-banking-formats>.

@@ -182,7 +182,7 @@ That's why camt.053 replaces CODA, MT940 and the other national files: each piec
 
 ## Run the examples
 
-Reading files is half the job. The repo has a small Java 25 module in `examples/` (Java 25 and Maven, no dependencies beyond the JDK, JUnit 5 tests) with one parser per statement format and a single `Statement` record they all produce. From the repo root:
+Reading files is half the job. The repo has a small Java 25 module in `examples/` (built with Maven, no dependencies beyond the JDK, JUnit 5 tests) with one parser per statement format and a single `Statement` record they all produce. To try it:
 
 ```bash
 git clone https://github.com/wallaceespindola/demystify-banking-formats.git
@@ -218,7 +218,7 @@ Lost in translation:
   - EndToEndId INV-2026-0042 has no MT103 field (kept only if the bank maps it to :70:)
 ```
 
-MT lines are 35 characters, so the creditor's name loses its tail and the building number `1200` becomes `120`. Nothing crashes. You just get a payment to a slightly different address with no end-to-end reference. The translator is a teaching example, not a production CBPR+ mapper, but the losses it reports are the kind you should look for in any real one.
+MT lines are 35 characters, so the creditor's name loses its tail and the building number `1200` becomes `120`. Nothing crashes. You just get a payment to a slightly different address, with the end-to-end reference surviving only as free text in `:70:`, if at all. The translator is a teaching example, not a production CBPR+ mapper, but the losses it reports are the kind you should look for in any real one.
 
 ## Things that will trip you up
 
